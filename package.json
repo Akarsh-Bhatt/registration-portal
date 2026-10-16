@@ -1,0 +1,11 @@
+{
+  "name": "upes-club-registration-portal",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "powershell -ExecutionPolicy Bypass -File ./start.ps1",
+    "backend": "cd backend && python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000",
+    "frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build"
+  }
+}
