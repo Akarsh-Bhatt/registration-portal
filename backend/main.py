@@ -36,7 +36,10 @@ def root():
 
 @app.get("/api/health")
 def health_check():
-    return database.get_status()
+    from bloom_filter import unique_id_generator
+    status = database.get_status()
+    status["bloom_filter"] = unique_id_generator.bloom_filter.get_stats()
+    return status
 
 @app.post("/api/connect-atlas")
 def connect_atlas(payload: dict):
@@ -74,17 +77,33 @@ def check_sapid(sapid: str):
         "name": existing.get("name") if existing else None
     }
 
+@app.get("/api/bloom-filter-stats")
+def get_bloom_stats():
+    """
+    Returns Bloom Filter metrics and status for HYP-XXXX ID generation.
+    """
+    from bloom_filter import unique_id_generator
+    return {
+        "status": "active",
+        "id_format": "HYP-XXXX (4-digit numerical)",
+        "stats": unique_id_generator.bloom_filter.get_stats()
+    }
+
 @app.post("/api/register", response_model=RegistrationResponse, status_code=status.HTTP_201_CREATED)
 def register_participant(data: ParticipantCreate):
     """
     Registers a new club participant into MongoDB Atlas and initiates payment order.
+    Generates a unique HYP-XXXX identifier verified via Bloom Filter for duplicacy.
     """
-    # Generate unique ticket / pass registration ID and Order ID
-    random_suffix = random.randint(1000, 9999)
+    from bloom_filter import unique_id_generator
+    # Generate unique ID in HYP-XXXX format using Bloom Filter
+    registration_id = unique_id_generator.generate_unique_id(
+        exists_in_db_fn=lambda cid: database.find_by_registration_id(cid) is not None
+    )
+
     order_suffix = random.randint(10000, 99999)
-    registration_id = f"UPES-CLUB-{data.sapid}-{random_suffix}"
-    order_id = f"ORD-{data.sapid}-{order_suffix}"
-    membership_fee = 299.0
+    order_id = f"ORD-{registration_id}-{order_suffix}"
+    membership_fee = 150.0
     
     doc = data.model_dump()
     doc["registration_id"] = registration_id
@@ -98,7 +117,7 @@ def register_participant(data: ParticipantCreate):
         inserted = database.insert_registration(doc)
         return RegistrationResponse(
             success=True,
-            message=f"Credentials verified for {data.name}! Proceeding to club fee payment.",
+            message=f"Credentials verified for {data.name}! Generated Unique ID: {registration_id}",
             registration_id=registration_id,
             order_id=order_id,
             amount=membership_fee,

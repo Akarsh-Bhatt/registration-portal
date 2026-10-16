@@ -1,40 +1,44 @@
-# NEXUS CLUB — UPES Student Chapter Registration & Payment Portal
+# HYPERVISION — UPES Student Chapter Registration & Payment Portal
 
-A complete club registration and checkout portal built with **React**, **Tailwind CSS**, **Python (FastAPI)**, and **MongoDB Atlas**.
+A club registration and checkout portal built with **React**, **Tailwind CSS**, **Python (FastAPI)**, and **MongoDB Atlas**, featuring the **Cosmic Lumina** design system.
 
 ---
 
 ## 🚀 Application Flow
 
-### 1. Participant Registration Form
+### 1. Participant Registration Form (`pages/pg1`)
 Captures all required student credentials with real-time validation:
-- **Name**: e.g., `Aarav Singh`
+- **Name**: e.g., `Aarav Sharma`
 - **SAPID**: Exactly 9 digits (e.g., `590012345`) with real-time duplicate check
 - **College Email**: e.g., `aarav.12345@stu.upes.ac.in` with 1-click `+ @stu.upes.ac.in` assistant
-- **Phone Number**: 10-digit mobile number with `+91` prefix validation
-- **Current Year**: Interactive pill selector (`1st Year`, `2nd Year`, `3rd Year`, `4th Year`, `5th Year / PG`)
-- **⚡ 1-Click Quick Fill**: Demo button to populate `Aarav Singh`'s credentials with 1 click.
+- **Phone Number**: 10-digit mobile number with validation
+- **Current Year**: Selection (`1st Year`, `2nd Year`, `3rd Year`, `4th Year`)
+- **⚡ 1-Click Quick Fill**: Demo button to populate `Aarav Sharma`'s credentials with 1 click.
+- **HYP-XXXX Unique ID with Bloom Filter**:
+  - Every registered participant is allocated a unique identifier formatted as `HYP-XXXX` (where `XXXX` is a 4-digit number, e.g. `HYP-4600`, `HYP-8155`).
+  - Utilizes an in-memory **Bloom Filter** ($m = 65536$ bits, $k = 5$ hash functions) to check for duplicacy with zero false negatives prior to database persistence.
 
 ---
 
-### 2. Integrated Payment Gateway Page
+### 2. Integrated Payment Gateway Page (`pages/pg2`)
 Opens immediately upon submitting credentials with verified order summary:
-- **Order ID**: e.g., `ORD-590012345-XXXXX` with live session countdown timer
+- **Unique Member ID**: Bloom Filter-verified `HYP-XXXX` displayed on order & receipt
+- **Order ID**: e.g., `ORD-HYP-XXXX-XXXXX`
 - **Credentials Review**: Confirms the student's Name, SAP ID, Email, Phone, and Academic Year
-- **Fee Breakdown**:
-  - Annual Club Membership Fee: ₹250.00
-  - Chapter Badge & ID Kit: ₹49.00
-  - Platform / Gateway Fee: FREE (₹0.00)
-  - **Total Payable: ₹299.00**
+- **Total Payable**: ₹150.00
 - **Payment Methods Supported**:
-  1. **UPI / Dynamic QR Code**: Scan & Pay with GPay, PhonePe, Paytm, BHIM, or enter UPI ID
-  2. **Credit / Debit Cards**: Visa, Mastercard, RuPay support with CVV and expiry
-  3. **Net Banking**: HDFC, SBI, ICICI, Axis, and UPES Campus Branch
-- **Simulate Payment**: 1-click test button to simulate instant bank authorization and update MongoDB Atlas
-- **Official Payment Receipt**:
-  - Unique Transaction ID (e.g. `TXN-UPES-XXXXXXXX`)
-  - Payment status verified & recorded in MongoDB Atlas
-  - **Print / Save as PDF** tax receipt option.
+  1. **UPI / Dynamic QR Code**: Official Admin UPI handle (`hypervision.upes@okhdfcbank`) with 1-click COPY & QR code
+  2. **Credit / Debit Cards**: Card entry with expiry and CVV
+  3. **Net Banking**: HDFC, SBI, ICICI, Axis
+- **12-Digit Transaction / UTR Ref Number**: Input with instant validation
+- **Confirm & Submit Transaction**: Updates MongoDB Atlas with verified status.
+
+---
+
+### 3. Registration Complete (`pages/pg3`)
+- Displays celebratory hero with "Registration complete!! Welcome to Hypervision"
+- Verified Member Holographic Showcase showing `HYP-XXXX` Unique ID and confirmation badge
+- Print / Save Receipt and "Register Another Member" actions.
 
 ---
 

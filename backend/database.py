@@ -28,7 +28,7 @@ _local_storage: List[Dict[str, Any]] = [
     {
         "_id": "demo-seed-1",
         "id": "demo-seed-1",
-        "registration_id": "UPES-CLUB-590099001-4192",
+        "registration_id": "HYP-4192",
         "name": "Priya Patel",
         "sapid": "590099001",
         "college_email": "priya.99001@stu.upes.ac.in",
@@ -250,18 +250,35 @@ def update_payment_record(reg_id: str, payment_info: Dict[str, Any]) -> Optional
                 return item
         return None
 
-def delete_registration(reg_id: str) -> bool:
-    global _local_storage
+def get_all_registration_ids() -> List[str]:
+    """
+    Returns all registered unique IDs across MongoDB Atlas or local store.
+    """
+    ids: List[str] = []
     if is_connected_to_atlas and collection is not None:
-        from bson import ObjectId
         try:
-            res = collection.delete_one({"$or": [{"_id": ObjectId(reg_id)}, {"registration_id": reg_id}]})
-            return res.deleted_count > 0
-        except Exception:
-            res = collection.delete_one({"registration_id": reg_id})
-            return res.deleted_count > 0
+            cursor = collection.find({}, {"registration_id": 1})
+            for doc in cursor:
+                rid = doc.get("registration_id")
+                if rid:
+                    ids.append(rid)
+        except Exception as e:
+            logger.error(f"Error fetching registration IDs: {e}")
     else:
-        orig_len = len(_local_storage)
-        _local_storage = [x for x in _local_storage if x.get("id") != reg_id and x.get("registration_id") != reg_id]
-        return len(_local_storage) < orig_len
+        for item in _local_storage:
+            rid = item.get("registration_id")
+            if rid:
+                ids.append(rid)
+    return ids
+
+def sync_bloom_filter():
+    """
+    Synchronizes the Bloom Filter with all IDs currently in the database.
+    """
+    from bloom_filter import unique_id_generator
+    all_ids = get_all_registration_ids()
+    unique_id_generator.sync_with_existing(all_ids)
+
+# Trigger initial sync
+sync_bloom_filter()
 

@@ -80,14 +80,14 @@ class RegistrationResponse(BaseModel):
     message: str
     registration_id: str
     order_id: str
-    amount: float = 299.0
+    amount: float = 150.0
     participant: Optional[ParticipantRecord] = None
 
 class PaymentVerificationRequest(BaseModel):
     registration_id: str
     order_id: str
     payment_method: str = "UPI"
-    amount: float = 299.0
+    amount: float = 150.0
     transaction_id: Optional[str] = None
 
 class PaymentVerificationResponse(BaseModel):
