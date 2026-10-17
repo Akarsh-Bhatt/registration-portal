@@ -1,62 +1,58 @@
 import React from 'react';
-import { Sparkles, Database } from 'lucide-react';
+import hypervisionLogo from '../assets/logo.png';
 
-export default function Navbar({ atlasStatus, onOpenAtlasModal }) {
-  const isAtlasOnline = atlasStatus?.connected_to_atlas;
-
+export default function Navbar({ currentStep }) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          
-          {/* Brand Logo & Name */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 shadow-lg shadow-indigo-500/25 ring-1 ring-white/20">
-              <Sparkles className="w-6 h-6 text-white animate-pulse" />
-              <div className="absolute -inset-1 rounded-2xl bg-indigo-500/20 blur-sm -z-10" />
+    <header className="fixed top-0 left-0 w-full z-50 bg-[#0F0C19]/80 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+      <div className="h-24 max-w-[1240px] mx-auto px-6 flex items-center justify-between gap-4">
+        
+        {/* Brand & Rotating Tagline */}
+        <div className="flex items-center gap-4">
+          <a className="flex items-center gap-3.5 group cursor-pointer" href="#">
+            <div className="h-14 w-14 flex items-center justify-center">
+              <img
+                alt="Hypervision Logo"
+                className="h-14 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_14px_rgba(0,238,252,0.45)]"
+                src={hypervisionLogo}
+              />
             </div>
-            <div>
+            <div className="flex flex-col justify-center">
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
-                  NEXUS CLUB
-                </span>
-                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                  UPES Chapter
+                <span className="font-sora font-extrabold text-2xl tracking-wider text-white uppercase">
+                  hypervision
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium hidden sm:block">
-                Club Participant Registration Portal
-              </p>
+              <span className="font-mono text-sm font-semibold text-gray-400 tracking-widest uppercase inline-flex items-center gap-1.5 overflow-hidden">
+                <span className="relative inline-grid items-center h-5 min-w-[130px]">
+                  <span className="tagline-word-1 text-gray-300 absolute left-0">Innovate</span>
+                  <span className="tagline-word-2 text-gray-300 absolute left-0">Collaborate</span>
+                  <span className="tagline-word-3 text-gray-300 absolute left-0">Elevate</span>
+                </span>
+              </span>
             </div>
-          </div>
+          </a>
+        </div>
 
-          {/* MongoDB Atlas Status Pill */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onOpenAtlasModal}
-              title="Click to configure MongoDB Atlas Connection"
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer ${
-                isAtlasOnline
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
-              }`}
-            >
-              <Database className="w-3.5 h-3.5" />
-              <span className="relative flex h-2 w-2">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  isAtlasOnline ? 'bg-emerald-400' : 'bg-amber-400'
-                }`} />
-                <span className={`relative inline-flex rounded-full h-2 w-2 ${
-                  isAtlasOnline ? 'bg-emerald-500' : 'bg-amber-500'
-                }`} />
-              </span>
-              <span className="font-mono text-xs">
-                {isAtlasOnline ? 'MongoDB Atlas' : 'Atlas Ready'}
-              </span>
-            </button>
-          </div>
+        {/* Right Status Badges */}
+        <div className="flex items-center gap-3">
+          
+          {/* Step indicator badge matching pg2/pg3 */}
+          {currentStep === 'payment' && (
+            <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#15111F]/90 border border-[#00EEFC]/40 text-xs font-mono text-[#00EEFC] shadow-[0_0_15px_rgba(0,238,252,0.2)]">
+              <span className="w-2 h-2 rounded-full bg-[#00EEFC] animate-ping" />
+              <span className="font-semibold tracking-wider uppercase">Step 2 of 2: Registration Payment</span>
+            </div>
+          )}
+
+          {currentStep === 'complete' && (
+            <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#15111F]/90 border border-emerald-500/40 text-xs font-mono text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span className="font-semibold tracking-wider uppercase">Registration Verified</span>
+            </div>
+          )}
 
         </div>
+
       </div>
     </header>
   );

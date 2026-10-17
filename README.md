@@ -1,40 +1,43 @@
-# NEXUS CLUB — UPES Student Chapter Registration & Payment Portal
+# HYPERVISION — UPES Student Chapter Registration & Payment Portal
 
-A complete club registration and checkout portal built with **React**, **Tailwind CSS**, **Python (FastAPI)**, and **MongoDB Atlas**.
+A club registration and checkout portal built with **React**, **Tailwind CSS**, **Python (FastAPI)**, and **MongoDB Atlas**, featuring the **Cosmic Lumina** design system.
 
 ---
 
 ## 🚀 Application Flow
 
-### 1. Participant Registration Form
+### 1. Participant Registration Form (`pages/pg1`)
 Captures all required student credentials with real-time validation:
-- **Name**: e.g., `Aarav Singh`
+- **Name**: e.g., `Aarav Sharma`
 - **SAPID**: Exactly 9 digits (e.g., `590012345`) with real-time duplicate check
 - **College Email**: e.g., `aarav.12345@stu.upes.ac.in` with 1-click `+ @stu.upes.ac.in` assistant
-- **Phone Number**: 10-digit mobile number with `+91` prefix validation
-- **Current Year**: Interactive pill selector (`1st Year`, `2nd Year`, `3rd Year`, `4th Year`, `5th Year / PG`)
-- **⚡ 1-Click Quick Fill**: Demo button to populate `Aarav Singh`'s credentials with 1 click.
+- **Phone Number**: 10-digit mobile number with validation
+- **Current Year**: Selection (`1st Year`, `2nd Year`, `3rd Year`, `4th Year`)
+- **HYP-XXXX Unique ID with Bloom Filter**:
+  - Every registered participant is allocated a unique identifier formatted as `HYP-XXXX` (where `XXXX` is a 4-digit number, e.g. `HYP-4600`, `HYP-8155`).
+  - Utilizes an in-memory **Bloom Filter** ($m = 65536$ bits, $k = 5$ hash functions) to check for duplicacy with zero false negatives prior to database persistence.
 
 ---
 
-### 2. Integrated Payment Gateway Page
+### 2. Integrated Payment Gateway Page (`pages/pg2`)
 Opens immediately upon submitting credentials with verified order summary:
-- **Order ID**: e.g., `ORD-590012345-XXXXX` with live session countdown timer
+- **Unique Member ID**: Bloom Filter-verified `HYP-XXXX` displayed on order & receipt
+- **Order ID**: e.g., `ORD-HYP-XXXX-XXXXX`
 - **Credentials Review**: Confirms the student's Name, SAP ID, Email, Phone, and Academic Year
-- **Fee Breakdown**:
-  - Annual Club Membership Fee: ₹250.00
-  - Chapter Badge & ID Kit: ₹49.00
-  - Platform / Gateway Fee: FREE (₹0.00)
-  - **Total Payable: ₹299.00**
+- **Total Payable**: ₹150.00
 - **Payment Methods Supported**:
-  1. **UPI / Dynamic QR Code**: Scan & Pay with GPay, PhonePe, Paytm, BHIM, or enter UPI ID
-  2. **Credit / Debit Cards**: Visa, Mastercard, RuPay support with CVV and expiry
-  3. **Net Banking**: HDFC, SBI, ICICI, Axis, and UPES Campus Branch
-- **Simulate Payment**: 1-click test button to simulate instant bank authorization and update MongoDB Atlas
-- **Official Payment Receipt**:
-  - Unique Transaction ID (e.g. `TXN-UPES-XXXXXXXX`)
-  - Payment status verified & recorded in MongoDB Atlas
-  - **Print / Save as PDF** tax receipt option.
+  1. **UPI / Dynamic QR Code**: Official Admin UPI handle (`hypervision.upes@okhdfcbank`) with 1-click COPY & QR code
+  2. **Credit / Debit Cards**: Card entry with expiry and CVV
+  3. **Net Banking**: HDFC, SBI, ICICI, Axis
+- **12-Digit Transaction / UTR Ref Number**: Input with instant validation
+- **Confirm & Submit Transaction**: Updates MongoDB Atlas with verified status.
+
+---
+
+### 3. Registration Complete (`pages/pg3`)
+- Displays celebratory hero with "Registration complete!! Welcome to Hypervision"
+- Verified Member Holographic Showcase showing `HYP-XXXX` Unique ID and confirmation badge
+- Print / Save Receipt and "Register Another Member" actions.
 
 ---
 
@@ -106,4 +109,32 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
    MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
    DB_NAME=upes_club_portal
    ```
-   *Alternatively, click the **"Atlas Ready"** badge in the top-right corner of the website and paste it directly into the modal!*
+   *Your credentials will automatically connect to MongoDB Atlas on backend startup.*
+
+---
+
+## 📧 Official Hypervision SMTP Email System
+
+The backend includes an official SMTP messaging pipeline sending congratulatory welcome emails to new members upon payment confirmation:
+
+- **Official Sender**: `upes.hypervision@stu.upes.ac.in`
+- **Sender Display Name**: `UPES Hypervision Chapter`
+- **Recipient**: The candidate's registered college email (e.g. `aarav.12345@stu.upes.ac.in`)
+- **Email Content**:
+  - Congratulates the recipient on joining the Hypervision family.
+  - Prominently showcases their **Bloom Filter-verified Unique Member ID (`HYP-XXXX`)**.
+  - Includes a full membership summary (SAP ID, Academic Year, Transaction Reference).
+  - Outlines upcoming flagship hackathons, astronomy labs, and project bootcamps.
+  - Includes both responsive Cosmic Lumina HTML template and plain-text fallback.
+
+### Configuring Live SMTP Transmission in `backend/.env`:
+```env
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+SMTP_USER=upes.hypervision@stu.upes.ac.in
+SMTP_PASSWORD=your_office365_or_app_password
+SMTP_FROM_EMAIL=upes.hypervision@stu.upes.ac.in
+SMTP_FROM_NAME=UPES Hypervision Chapter
+SMTP_USE_TLS=true
+```
+*(If `SMTP_PASSWORD` is left empty, the system operates in simulation mode, logging the full formatted message to console and never interrupting user checkout).*

@@ -1,73 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ShieldCheck, Lock, CheckCircle2, QrCode, CreditCard, 
-  Building2, Smartphone, ArrowRight, ArrowLeft, RefreshCw, 
-  Copy, Check, AlertCircle, Sparkles, Clock, Download, Printer, ExternalLink
-} from 'lucide-react';
-import confetti from 'canvas-confetti';
+import React, { useState } from 'react';
 
 const POPULAR_BANKS = [
-  { id: 'hdfc', name: 'HDFC Bank', icon: '🏦' },
-  { id: 'sbi', name: 'State Bank of India', icon: '🏛️' },
-  { id: 'icici', name: 'ICICI Bank', icon: '🏢' },
-  { id: 'axis', name: 'Axis Bank', icon: '🏧' },
-  { id: 'upes', name: 'UPES Campus Branch', icon: '🎓' }
+  { id: 'hdfc', name: 'HDFC Bank' },
+  { id: 'sbi', name: 'State Bank of India' },
+  { id: 'icici', name: 'ICICI Bank' },
+  { id: 'axis', name: 'Axis Bank' }
 ];
 
 export default function PaymentGateway({ orderData, onCancel, onPaymentComplete }) {
   const [activeMethod, setActiveMethod] = useState('upi'); // 'upi' | 'card' | 'netbanking'
-  const [upiId, setUpiId] = useState(orderData?.participant?.sapid ? `${orderData.participant.sapid}@upi` : 'aarav@okaxis');
-  const [selectedBank, setSelectedBank] = useState('hdfc');
+  const [utrNumber, setUtrNumber] = useState('402918239012');
+  const [copiedUpi, setCopiedUpi] = useState(false);
   
-  // Card form state
-  const [cardNumber, setCardNumber] = useState('4532 •••• •••• 8821');
+  // Card states
+  const [cardNumber, setCardNumber] = useState('4532 8912 3019 4410');
   const [cardExpiry, setCardExpiry] = useState('08/29');
   const [cardCvv, setCardCvv] = useState('742');
-  const [cardName, setCardName] = useState(orderData?.participant?.name || 'Aarav Singh');
 
-  // Gateway flow state
+  // NetBanking state
+  const [selectedBank, setSelectedBank] = useState('hdfc');
+
+  // Processing state
   const [processing, setProcessing] = useState(false);
-  const [processStep, setProcessStep] = useState('');
-  const [receipt, setReceipt] = useState(null);
-  const [timerSeconds, setTimerSeconds] = useState(599); // 10 minutes countdown
-  const [copiedTxn, setCopiedTxn] = useState(false);
 
-  // Countdown timer for realistic payment session
-  useEffect(() => {
-    if (receipt) return;
-    const timer = setInterval(() => {
-      setTimerSeconds(prev => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [receipt]);
-
-  const formatTimer = () => {
-    const mins = Math.floor(timerSeconds / 60);
-    const secs = timerSeconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const participant = orderData?.participant || {
+    name: 'Aarav Sharma',
+    sapid: '590012345',
+    college_email: 'aarav.12345@stu.upes.ac.in',
+    phone: '9876543210',
+    current_year: '2nd Year'
   };
 
-  const handleProcessPayment = async (methodName) => {
+  const uniqueId = orderData?.registration_id || 'HYP-1024';
+  const amount = orderData?.amount || 150.0;
+
+  const handleCopyUpi = () => {
+    navigator.clipboard?.writeText('hypervision.upes@okhdfcbank');
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2000);
+  };
+
+  const handleConfirmTransaction = async (e) => {
+    if (e) e.preventDefault();
     setProcessing(true);
-    setProcessStep('Connecting to payment gateway network...');
 
     try {
-      await new Promise(r => setTimeout(r, 800));
-      setProcessStep('Authorizing payment with bank server...');
+      const randomTxn = utrNumber.trim() || `TXN-UPES-${Math.floor(10000000 + Math.random() * 90000000)}`;
       
-      await new Promise(r => setTimeout(r, 900));
-      setProcessStep('Verifying order and updating MongoDB Atlas...');
-
-      // Call backend verification
-      const randomTxn = `TXN-UPES-${Math.floor(10000000 + Math.random() * 90000000)}`;
       const response = await fetch('/api/verify-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          registration_id: orderData.registration_id,
-          order_id: orderData.order_id,
-          payment_method: methodName,
-          amount: orderData.amount || 299.0,
+          registration_id: uniqueId,
+          order_id: orderData?.order_id || `ORD-${uniqueId}-100`,
+          payment_method: activeMethod.toUpperCase(),
+          amount: amount,
           transaction_id: randomTxn
         })
       });
@@ -77,17 +64,6 @@ export default function PaymentGateway({ orderData, onCancel, onPaymentComplete 
         throw new Error(data.detail || 'Payment verification failed');
       }
 
-      // Trigger Celebration Confetti
-      try {
-        confetti({
-          particleCount: 130,
-          spread: 80,
-          origin: { y: 0.6 },
-          colors: ['#10b981', '#6366f1', '#a855f7', '#38bdf8']
-        });
-      } catch {}
-
-      setReceipt(data);
       if (onPaymentComplete) {
         onPaymentComplete(data);
       }
@@ -95,574 +71,332 @@ export default function PaymentGateway({ orderData, onCancel, onPaymentComplete 
       alert(`Payment Error: ${err.message}`);
     } finally {
       setProcessing(false);
-      setProcessStep('');
     }
   };
 
-  const participant = orderData?.participant || {
-    name: 'Aarav Singh',
-    sapid: '590012345',
-    college_email: 'aarav.12345@stu.upes.ac.in',
-    phone: '9876543210',
-    current_year: '2nd Year'
-  };
-
-  // SUCCESS RECEIPT VIEW
-  if (receipt) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12 animate-fade-in">
-        <div className="glass-panel rounded-3xl p-6 sm:p-10 border border-emerald-500/30 text-center relative overflow-hidden shadow-2xl">
-          
-          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-
-          {/* Success Badge */}
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/25">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
-
-          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-            Payment Completed • Active Club Member
-          </span>
-
-          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-3">
-            Payment Successful!
-          </h2>
-          <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-md mx-auto">
-            Your ₹{orderData.amount || 299.0} club intake fee has been verified and permanently updated in <strong className="text-emerald-400">MongoDB Atlas</strong>.
-          </p>
-
-          {/* Digital Receipt Card */}
-          <div className="mt-8 p-6 rounded-2xl bg-slate-900/90 border border-white/10 text-left space-y-4">
-            
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div>
-                <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                  Transaction Reference
-                </p>
-                <p className="text-sm font-mono font-bold text-emerald-400">
-                  {receipt.transaction_id}
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(receipt.transaction_id);
-                  setCopiedTxn(true);
-                  setTimeout(() => setCopiedTxn(false), 2000);
-                }}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1 cursor-pointer"
-              >
-                {copiedTxn ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span className="text-[11px]">{copiedTxn ? 'Copied' : 'Copy'}</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <span className="text-slate-400 block text-[11px]">Participant Name</span>
-                <span className="font-bold text-white text-sm">{participant.name}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[11px]">SAP ID</span>
-                <span className="font-mono font-bold text-indigo-300 text-sm">{participant.sapid}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[11px]">College Email</span>
-                <span className="font-mono text-slate-200 truncate block">{participant.college_email}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[11px]">Phone Number</span>
-                <span className="font-mono text-slate-200">+91 {participant.phone}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[11px]">Current Year</span>
-                <span className="text-slate-200 font-semibold">{participant.current_year}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[11px]">Amount Paid</span>
-                <span className="font-mono font-extrabold text-emerald-400 text-base">₹{orderData.amount || 299}.00</span>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-              <span>Order: {orderData.order_id}</span>
-              <span>Paid: {new Date(receipt.paid_at || Date.now()).toLocaleTimeString()}</span>
-            </div>
-
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={() => window.print()}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs sm:text-sm font-semibold transition-all cursor-pointer"
-            >
-              <Printer className="w-4 h-4 text-indigo-400" />
-              <span>Print Payment Receipt</span>
-            </button>
-
-            <button
-              onClick={onCancel}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg shadow-indigo-600/25 cursor-pointer"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>Register Another Member</span>
-            </button>
-          </div>
-
-        </div>
-      </div>
-    );
-  }
-
-  // ACTIVE PAYMENT CHECKOUT VIEW
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12">
-      
-      {/* Top Session & Security Indicator */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-8 pb-4 border-b border-slate-800/80">
-        <button
-          onClick={onCancel}
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Registration</span>
-        </button>
-
-        <div className="flex items-center gap-4 text-xs font-medium">
-          <div className="flex items-center gap-1.5 text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
-            <Clock className="w-3.5 h-3.5 animate-spin" />
-            <span className="font-mono">Session expires: {formatTimer()}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
-            <Lock className="w-3.5 h-3.5" />
-            <span>256-Bit SSL Encrypted</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <main className="w-full pt-32 pb-20 relative z-10">
+      <div className="max-w-[1240px] mx-auto px-6 flex flex-col items-center">
         
-        {/* LEFT COLUMN: Order Summary & Participant Credentials Review */}
-        <div className="lg:col-span-5 space-y-6">
-          
-          <div className="glass-panel rounded-3xl p-6 sm:p-7 border border-white/10 shadow-xl relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
-              <div>
-                <p className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider">
-                  Club Membership Intake
-                </p>
-                <h3 className="text-lg font-extrabold text-white">
-                  Order Summary
-                </h3>
-              </div>
-              <span className="px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                {orderData.order_id}
-              </span>
-            </div>
+        {/* Hero Header Section from pg2 */}
+        <section className="flex flex-col items-center text-center pt-2 pb-8 max-w-3xl">
+          <h1 className="font-sora font-extrabold text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight cosmic-text-gradient drop-shadow-[0_0_40px_rgba(153,0,255,0.4)] max-w-4xl text-center">
+            Complete Membership Payment
+          </h1>
+          <p className="mt-3 text-gray-300 font-outfit text-sm sm:text-base max-w-xl text-center">
+            Registration Fee: <span className="text-[#00EEFC] font-semibold font-mono text-lg">₹{amount.toFixed(0)}</span>
+          </p>
+        </section>
 
-            {/* Participant Credentials Details */}
-            <div className="p-4 rounded-2xl bg-slate-900/80 border border-white/5 space-y-2.5 text-xs mb-5">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Participant:</span>
-                <span className="font-bold text-white">{participant.name}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">SAP ID:</span>
-                <span className="font-mono font-bold text-indigo-300">{participant.sapid}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">College Email:</span>
-                <span className="font-mono text-slate-300 truncate max-w-[170px]" title={participant.college_email}>
-                  {participant.college_email}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Phone:</span>
-                <span className="font-mono text-slate-300">+91 {participant.phone}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Academic Year:</span>
-                <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20">
-                  {participant.current_year}
-                </span>
-              </div>
-            </div>
-
-            {/* Price Breakdown */}
-            <div className="space-y-2 text-xs border-b border-white/10 pb-4">
-              <div className="flex justify-between text-slate-300">
-                <span>Annual Club Membership Fee</span>
-                <span className="font-mono">₹250.00</span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Chapter Badge & Orientation Kit</span>
-                <span className="font-mono">₹49.00</span>
-              </div>
-              <div className="flex justify-between text-emerald-400">
-                <span>Platform & Gateway Fee</span>
-                <span className="font-bold font-mono">FREE (₹0.00)</span>
-              </div>
-            </div>
-
-            {/* Total Amount Due */}
-            <div className="pt-4 flex items-baseline justify-between">
-              <span className="text-sm font-extrabold text-white uppercase tracking-wider">
-                Total Payable
-              </span>
-              <div className="text-right">
-                <span className="text-3xl font-black text-white font-mono tracking-tight">
-                  ₹{orderData.amount || 299}.00
-                </span>
-                <p className="text-[10px] text-slate-400">Inclusive of all college chapter taxes</p>
-              </div>
-            </div>
-
-            {/* Perks included */}
-            <div className="mt-5 pt-4 border-t border-white/5 space-y-1.5 text-[11px] text-slate-400">
-              <p className="font-semibold text-slate-300">Included with this registration:</p>
-              <p className="flex items-center gap-1.5 text-slate-300">
-                <Check className="w-3.5 h-3.5 text-emerald-400" /> Official UPES Chapter ID & Access Card
-              </p>
-              <p className="flex items-center gap-1.5 text-slate-300">
-                <Check className="w-3.5 h-3.5 text-emerald-400" /> Guaranteed entry into Annual Nexus Hackathon
-              </p>
-              <p className="flex items-center gap-1.5 text-slate-300">
-                <Check className="w-3.5 h-3.5 text-emerald-400" /> Access to GitHub Club Organization
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* RIGHT COLUMN: Payment Method Selection & Checkout Gateway */}
-        <div className="lg:col-span-7">
-          <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl relative overflow-hidden">
+        {/* Centered Focal Registration Card from pg2 */}
+        <div className="w-full max-w-5xl mx-auto" id="register">
+          <div className="glass-card rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.85)] relative overflow-hidden border border-purple-500/30">
             
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-white tracking-tight">
-                  Select Payment Method
-                </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Choose your preferred option to complete club registration
-                </p>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Verified Gateway</span>
-              </div>
-            </div>
+            {/* Top accent bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#6823C3] via-[#007BFF] to-[#00EEFC]" />
 
-            {/* Payment Method Selector Tabs */}
-            <div className="grid grid-cols-3 gap-2 p-1.5 rounded-2xl bg-slate-900/90 border border-white/10 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 pt-2">
               
-              <button
-                type="button"
-                onClick={() => setActiveMethod('upi')}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 cursor-pointer ${
-                  activeMethod === 'upi'
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                }`}
-              >
-                <Smartphone className="w-4 h-4" />
-                <span>UPI / QR</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveMethod('card')}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 cursor-pointer ${
-                  activeMethod === 'card'
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                }`}
-              >
-                <CreditCard className="w-4 h-4" />
-                <span>Card</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveMethod('netbanking')}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 cursor-pointer ${
-                  activeMethod === 'netbanking'
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                }`}
-              >
-                <Building2 className="w-4 h-4" />
-                <span>Net Banking</span>
-              </button>
-
-            </div>
-
-            {/* TAB 1: UPI / QR CODE */}
-            {activeMethod === 'upi' && (
-              <div className="space-y-6 animate-fade-in">
+              {/* LEFT COLUMN: Payment Method Selection */}
+              <div className="lg:col-span-7 flex flex-col gap-5">
                 
-                {/* Visual QR Code Card */}
-                <div className="p-6 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-white/10 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <span className="font-mono text-xs uppercase tracking-widest text-[#deb7ff] font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base text-[#00EEFC]">
+                      account_balance_wallet
+                    </span>
+                    Select Payment Method
+                  </span>
+                  <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">verified_user</span>
+                    Instant Verification
+                  </span>
+                </div>
+
+                {/* Method selector tabs */}
+                <div className="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-[#0F0C19]/90 border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setActiveMethod('upi')}
+                    className={`py-2.5 px-3 rounded-xl font-mono text-xs font-semibold flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                      activeMethod === 'upi'
+                        ? 'bg-gradient-to-r from-purple-900/50 to-cyan-900/40 border border-[#00EEFC]/50 text-white shadow-[0_0_15px_rgba(0,238,252,0.2)]'
+                        : 'border border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-lg ${activeMethod === 'upi' ? 'text-[#00EEFC]' : ''}`}>
+                      qr_code_2
+                    </span>
+                    <span>UPI / QR</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveMethod('card')}
+                    className={`py-2.5 px-3 rounded-xl font-mono text-xs font-medium flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                      activeMethod === 'card'
+                        ? 'bg-gradient-to-r from-purple-900/50 to-cyan-900/40 border border-[#00EEFC]/50 text-white shadow-[0_0_15px_rgba(0,238,252,0.2)]'
+                        : 'border border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-lg ${activeMethod === 'card' ? 'text-[#00EEFC]' : ''}`}>
+                      credit_card
+                    </span>
+                    <span>Card</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveMethod('netbanking')}
+                    className={`py-2.5 px-3 rounded-xl font-mono text-xs font-medium flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                      activeMethod === 'netbanking'
+                        ? 'bg-gradient-to-r from-purple-900/50 to-cyan-900/40 border border-[#00EEFC]/50 text-white shadow-[0_0_15px_rgba(0,238,252,0.2)]'
+                        : 'border border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-lg ${activeMethod === 'netbanking' ? 'text-[#00EEFC]' : ''}`}>
+                      account_balance
+                    </span>
+                    <span>NetBanking</span>
+                  </button>
+                </div>
+
+                {/* TAB 1: UPI / QR Payment */}
+                {activeMethod === 'upi' && (
+                  <div className="criteria-box rounded-2xl p-5 flex flex-col gap-5">
+                    
+                    {/* QR Code and UPI ID */}
+                    <div className="flex flex-col sm:flex-row items-center gap-5 p-4 rounded-xl bg-[#0F0C19]/90 border border-purple-500/30">
+                      
+                      <div className="w-36 h-36 p-2 rounded-xl bg-white shadow-[0_0_25px_rgba(0,238,252,0.35)] flex flex-col items-center justify-center relative shrink-0">
+                        <svg className="w-full h-full text-black" fill="currentColor" viewBox="0 0 100 100">
+                          <path d="M5,5 h30 v30 h-30 z M10,10 v20 h20 v-20 z M15,15 h10 v10 h-10 z M65,5 h30 v30 h-30 z M70,10 v20 h20 v-20 z M75,15 h10 v10 h-10 z M5,65 h30 v30 h-30 z M10,70 v20 h20 v-20 z M15,75 h10 v10 h-10 z M42,10 h8 v8 h-8 z M42,24 h8 v14 h-8 z M54,14 h10 v8 h-10 z M10,44 h8 v14 h-8 z M22,44 h14 v6 h-14 z M26,54 h10 v10 h-10 z M44,44 h12 v12 h-12 z M62,44 h8 v8 h-8 z M76,44 h14 v8 h-14 z M60,56 h10 v14 h-10 z M74,56 h18 v8 h-18 z M44,62 h8 v14 h-8 z M56,76 h12 v10 h-12 z M74,74 h8 v16 h-8 z M86,70 h8 v18 h-8 z M42,82 h10 v8 h-10 z" />
+                          <circle cx="50" cy="50" fill="#6823C3" r="8" />
+                          <circle cx="50" cy="50" fill="#00EEFC" r="4" />
+                        </svg>
+                        <div className="absolute -bottom-2 bg-[#0A071B] border border-[#00EEFC]/60 px-2 py-0.5 rounded text-[10px] font-mono font-bold text-[#00EEFC]">
+                          ₹{amount.toFixed(2)}
+                        </div>
+                      </div>
+
+                      <div className="flex-1 flex flex-col gap-2 text-center sm:text-left">
+                        <div className="text-xs font-mono uppercase tracking-wider text-gray-400">
+                          Official Admin UPI Handle
+                        </div>
+                        <div className="flex items-center gap-2 bg-[#15111F] px-3 py-2 rounded-lg border border-white/10">
+                          <code className="font-mono text-xs sm:text-sm text-[#00EEFC] font-semibold flex-1 select-all truncate">
+                            hypervision.upes@okhdfcbank
+                          </code>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/40 text-[#deb7ff] font-mono text-[11px] font-bold border border-purple-500/40 transition-colors cursor-pointer"
+                          >
+                            {copiedUpi ? 'COPIED' : 'COPY'}
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-400 font-outfit leading-relaxed">
+                          Scan via Google Pay, PhonePe, Paytm, or BHIM. Automatic instant reconciliation.
+                        </p>
+                      </div>
+
+                    </div>
+
+                    {/* UTR Input Form */}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
+                          <span className="text-[#00EEFC] font-bold">•</span> 12-Digit Transaction / UTR Ref Number <span className="text-[#00EEFC]">*</span>
+                        </label>
+                        <span className="text-[10px] font-mono text-[#00EEFC] uppercase tracking-wider bg-[#00EEFC]/10 px-2 py-0.5 rounded border border-[#00EEFC]/30">
+                          Mandatory
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">
+                          tag
+                        </span>
+                        <input
+                          type="text"
+                          required
+                          maxLength={16}
+                          value={utrNumber}
+                          onChange={(e) => setUtrNumber(e.target.value)}
+                          placeholder="e.g. 402918239012"
+                          className="w-full bg-[#0F0C19]/90 border border-white/15 focus:border-[#00EEFC] focus:ring-2 focus:ring-[#00EEFC]/25 text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 font-mono outline-none transition-all shadow-inner"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
+                {/* TAB 2: Card Payment */}
+                {activeMethod === 'card' && (
+                  <div className="criteria-box rounded-2xl p-5 flex flex-col gap-4">
+                    <div>
+                      <label className="font-mono text-xs uppercase tracking-wider text-gray-300 block mb-1">
+                        Card Number
+                      </label>
+                      <input
+                        type="text"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        placeholder="4532 8912 3019 4410"
+                        className="w-full bg-[#0F0C19]/90 border border-white/15 text-white rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-[#00EEFC]"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="font-mono text-xs uppercase tracking-wider text-gray-300 block mb-1">
+                          Expiry (MM/YY)
+                        </label>
+                        <input
+                          type="text"
+                          value={cardExpiry}
+                          onChange={(e) => setCardExpiry(e.target.value)}
+                          placeholder="08/29"
+                          className="w-full bg-[#0F0C19]/90 border border-white/15 text-white rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-[#00EEFC]"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-mono text-xs uppercase tracking-wider text-gray-300 block mb-1">
+                          CVV
+                        </label>
+                        <input
+                          type="password"
+                          value={cardCvv}
+                          onChange={(e) => setCardCvv(e.target.value)}
+                          placeholder="742"
+                          maxLength={4}
+                          className="w-full bg-[#0F0C19]/90 border border-white/15 text-white rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-[#00EEFC]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 3: NetBanking */}
+                {activeMethod === 'netbanking' && (
+                  <div className="criteria-box rounded-2xl p-5 flex flex-col gap-3">
+                    <label className="font-mono text-xs uppercase tracking-wider text-gray-300">
+                      Select Bank
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {POPULAR_BANKS.map(bank => (
+                        <button
+                          key={bank.id}
+                          type="button"
+                          onClick={() => setSelectedBank(bank.id)}
+                          className={`p-3 rounded-xl border text-xs font-mono font-medium text-left cursor-pointer transition-all ${
+                            selectedBank === bank.id
+                              ? 'bg-purple-900/40 border-[#00EEFC] text-[#00EEFC]'
+                              : 'bg-[#0F0C19]/90 border-white/10 text-gray-300'
+                          }`}
+                        >
+                          {bank.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+              {/* RIGHT COLUMN: Registration Review & Submission from pg2 */}
+              <div className="lg:col-span-5 flex flex-col gap-4">
+                <div className="criteria-box rounded-2xl p-5 flex flex-col gap-4">
                   
-                  {/* Dynamic QR Box */}
-                  <div className="p-3 rounded-2xl bg-white text-slate-950 shadow-2xl relative shrink-0">
-                    <svg className="w-36 h-36" viewBox="0 0 100 100" fill="currentColor">
-                      <rect x="8" y="8" width="28" height="28" fill="#000" />
-                      <rect x="12" y="12" width="20" height="20" fill="#fff" />
-                      <rect x="16" y="16" width="12" height="12" fill="#000" />
-
-                      <rect x="64" y="8" width="28" height="28" fill="#000" />
-                      <rect x="68" y="12" width="20" height="20" fill="#fff" />
-                      <rect x="72" y="16" width="12" height="12" fill="#000" />
-
-                      <rect x="8" y="64" width="28" height="28" fill="#000" />
-                      <rect x="12" y="68" width="20" height="20" fill="#fff" />
-                      <rect x="16" y="72" width="12" height="12" fill="#000" />
-
-                      <rect x="42" y="12" width="16" height="10" fill="#000" />
-                      <rect x="42" y="32" width="16" height="6" fill="#000" />
-                      <rect x="64" y="42" width="10" height="12" fill="#000" />
-                      <rect x="52" y="52" width="16" height="8" fill="#000" />
-                      <rect x="74" y="64" width="12" height="14" fill="#000" />
-                      <rect x="42" y="70" width="8" height="16" fill="#000" />
-                      <rect x="58" y="78" width="16" height="8" fill="#000" />
-                    </svg>
-                    <span className="block text-[9px] font-mono font-bold mt-1 tracking-wider text-slate-700 text-center">
-                      SCAN WITH ANY UPI APP
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <span className="font-mono text-xs uppercase tracking-widest text-[#deb7ff] font-semibold flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base text-[#7df4ff]">receipt_long</span>
+                      Registration Review
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-[#00EEFC] font-mono text-[11px] border border-cyan-500/20">
+                      Ready to Pay
                     </span>
                   </div>
 
-                  {/* QR Instructions & Accepted Apps */}
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="text-sm font-bold text-white">
-                        Scan & Pay via UPI App
-                      </h4>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Open Google Pay, PhonePe, Paytm, or BHIM to complete ₹{orderData.amount || 299} payment.
-                      </p>
+                  {/* Review details */}
+                  <div className="p-3.5 rounded-xl bg-[#0F0C19]/80 border border-white/10 flex flex-col gap-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-400 font-mono">Unique ID:</span>
+                      <span className="text-[#00EEFC] font-mono font-bold tracking-wider">
+                        {uniqueId}
+                      </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 text-[10px] font-semibold text-slate-300">
-                      <span className="px-2 py-1 rounded bg-slate-800 border border-white/10">Google Pay</span>
-                      <span className="px-2 py-1 rounded bg-slate-800 border border-white/10">PhonePe</span>
-                      <span className="px-2 py-1 rounded bg-slate-800 border border-white/10">Paytm</span>
-                      <span className="px-2 py-1 rounded bg-slate-800 border border-white/10">BHIM UPI</span>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-400 font-mono">Candidate:</span>
+                      <span className="text-white font-medium">{participant.name}</span>
                     </div>
 
-                    <p className="text-[11px] text-emerald-400 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" /> Instant auto-confirmation upon payment
-                    </p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-400 font-mono">SAP ID:</span>
+                      <span className="text-white font-mono font-semibold">{participant.sapid}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-400 font-mono">Year:</span>
+                      <span className="text-[#deb7ff] font-semibold">{participant.current_year}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-400 font-mono">Tier:</span>
+                      <span className="text-[#deb7ff] font-semibold">Member</span>
+                    </div>
+
+                    <div className="text-[11px] text-gray-400 pt-1 border-t border-white/5">
+                      Technical Events, Astronomy Labs &amp; Flagship Hackathons 2025/26
+                    </div>
                   </div>
 
-                </div>
-
-                {/* OR Enter UPI ID */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide mb-1.5">
-                    Or Enter UPI ID / VPA
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={upiId}
-                      onChange={(e) => setUpiId(e.target.value)}
-                      placeholder="e.g. mobile@upi or username@okaxis"
-                      className="w-full px-4 py-2.5 rounded-xl text-xs font-mono glass-input text-white placeholder-slate-500 outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleProcessPayment('UPI ID Push')}
-                      disabled={processing}
-                      className="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shrink-0 transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      Verify & Pay
-                    </button>
+                  <div className="flex flex-col gap-2 pt-1">
+                    <div className="flex items-center justify-between text-sm font-mono pt-2 border-t border-white/10 font-bold">
+                      <span className="text-white">Total Payable:</span>
+                      <span className="text-[#00EEFC] text-base drop-shadow-[0_0_8px_rgba(0,238,252,0.5)]">
+                        ₹{amount.toFixed(2)}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Instant 1-Click Payment Simulator Button */}
-                <div className="pt-2">
+                  {/* Submit CTA button from pg2 */}
                   <button
                     type="button"
-                    onClick={() => handleProcessPayment('UPI - Instant Gateway')}
+                    onClick={handleConfirmTransaction}
                     disabled={processing}
-                    className="w-full py-3.5 rounded-2xl font-bold text-sm tracking-wide text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:via-teal-500 hover:to-indigo-500 shadow-xl shadow-emerald-600/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 hover:scale-[1.01] active:scale-[0.99]"
+                    className="btn-cosmic-glow w-full py-4 px-6 rounded-xl font-sora font-bold text-sm tracking-wide uppercase text-white flex items-center justify-center gap-2 group cursor-pointer shadow-[0_0_25px_rgba(0,238,252,0.4)] mt-1 disabled:opacity-50"
                   >
                     {processing ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>{processStep || 'Processing Payment...'}</span>
+                        <span>Verifying Transaction...</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-4 h-4 text-emerald-200" />
-                        <span>Simulate Successful Payment (₹{orderData.amount || 299}.00)</span>
-                        <ArrowRight className="w-4 h-4" />
+                        <span className="material-symbols-outlined text-white text-[19px]">verified</span>
+                        <span>Confirm &amp; Submit Transaction</span>
                       </>
                     )}
                   </button>
-                  <p className="text-[11px] text-slate-400 text-center mt-2">
-                    Click to test the live payment approval & MongoDB Atlas confirmation pipeline.
-                  </p>
-                </div>
 
+                  <button
+                    type="button"
+                    onClick={onCancel}
+                    className="text-center font-mono text-xs text-gray-400 hover:text-[#00EEFC] transition-colors py-1 cursor-pointer bg-transparent border-none"
+                  >
+                    ← Return to Registration Form
+                  </button>
+
+                </div>
               </div>
-            )}
 
-            {/* TAB 2: CREDIT / DEBIT CARDS */}
-            {activeMethod === 'card' && (
-              <form onSubmit={(e) => { e.preventDefault(); handleProcessPayment('Credit/Debit Card'); }} className="space-y-4 animate-fade-in">
-                
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide">
-                      Card Number
-                    </label>
-                    <span className="text-[10px] text-indigo-400 font-semibold">Visa • Mastercard • RuPay</span>
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    placeholder="4532 0000 0000 0000"
-                    className="w-full px-4 py-2.5 rounded-xl text-xs font-mono glass-input text-white placeholder-slate-500 outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide mb-1.5">
-                      Expiry (MM/YY)
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={cardExpiry}
-                      onChange={(e) => setCardExpiry(e.target.value)}
-                      placeholder="08/29"
-                      maxLength={5}
-                      className="w-full px-4 py-2.5 rounded-xl text-xs font-mono glass-input text-white placeholder-slate-500 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide mb-1.5">
-                      CVV / CVC
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      value={cardCvv}
-                      onChange={(e) => setCardCvv(e.target.value)}
-                      placeholder="742"
-                      maxLength={4}
-                      className="w-full px-4 py-2.5 rounded-xl text-xs font-mono glass-input text-white placeholder-slate-500 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide mb-1.5">
-                    Cardholder Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={cardName}
-                    onChange={(e) => setCardName(e.target.value)}
-                    placeholder="e.g. Aarav Singh"
-                    className="w-full px-4 py-2.5 rounded-xl text-xs glass-input text-white placeholder-slate-500 outline-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="w-full mt-4 py-3.5 rounded-2xl font-bold text-sm tracking-wide text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 shadow-xl shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {processing ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{processStep || 'Verifying Card with Bank...'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      <span>Pay ₹{orderData.amount || 299}.00 with Card</span>
-                    </>
-                  )}
-                </button>
-
-              </form>
-            )}
-
-            {/* TAB 3: NET BANKING */}
-            {activeMethod === 'netbanking' && (
-              <div className="space-y-4 animate-fade-in">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide mb-1.5">
-                  Select Your Bank
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {POPULAR_BANKS.map(bank => {
-                    const isSelected = selectedBank === bank.id;
-                    return (
-                      <button
-                        key={bank.id}
-                        type="button"
-                        onClick={() => setSelectedBank(bank.id)}
-                        className={`p-3 rounded-xl border text-left text-xs font-bold transition-all flex items-center gap-2.5 cursor-pointer ${
-                          isSelected
-                            ? 'bg-indigo-600/30 border-indigo-500 text-white shadow-md ring-1 ring-indigo-400'
-                            : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700'
-                        }`}
-                      >
-                        <span className="text-lg">{bank.icon}</span>
-                        <span>{bank.name}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleProcessPayment(`Net Banking (${selectedBank.toUpperCase()})`)}
-                  disabled={processing}
-                  className="w-full mt-4 py-3.5 rounded-2xl font-bold text-sm tracking-wide text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 shadow-xl shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {processing ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{processStep || 'Redirecting to Bank Portal...'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Building2 className="w-4 h-4" />
-                      <span>Proceed to Bank Login (₹{orderData.amount || 299}.00)</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Bottom Security Footer */}
-            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                PCI-DSS Compliant Gateway
-              </span>
-              <span>UPES Student Chapter Portal</span>
             </div>
 
           </div>
         </div>
 
       </div>
-
-    </div>
+    </main>
   );
 }

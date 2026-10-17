@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query, status
+from fastapi import FastAPI, HTTPException, Query, status, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import random
@@ -9,10 +9,11 @@ from models import (
     PaymentVerificationRequest, PaymentVerificationResponse, StatsResponse
 )
 import database
+from smtp_service import send_welcome_email, get_smtp_status, OFFICIAL_EMAIL
 
 app = FastAPI(
     title="UPES Student Club Registration Portal API",
-    description="Backend API powered by Python, FastAPI, and MongoDB Atlas with Payment Gateway Integration",
+    description="Backend API powered by Python, FastAPI, and MongoDB Atlas with Payment Gateway & SMTP Integration",
     version="1.0.0"
 )
 
@@ -31,12 +32,17 @@ def root():
         "status": "online",
         "service": "UPES Club Registration Portal API",
         "documentation": "/docs",
-        "database": database.get_status()
+        "database": database.get_status(),
+        "smtp": get_smtp_status()
     }
 
 @app.get("/api/health")
 def health_check():
-    return database.get_status()
+    from bloom_filter import unique_id_generator
+    status_info = database.get_status()
+    status_info["bloom_filter"] = unique_id_generator.bloom_filter.get_stats()
+    status_info["smtp"] = get_smtp_status()
+    return status_info
 
 @app.post("/api/connect-atlas")
 def connect_atlas(payload: dict):
@@ -74,17 +80,33 @@ def check_sapid(sapid: str):
         "name": existing.get("name") if existing else None
     }
 
+@app.get("/api/bloom-filter-stats")
+def get_bloom_stats():
+    """
+    Returns Bloom Filter metrics and status for HYP-XXXX ID generation.
+    """
+    from bloom_filter import unique_id_generator
+    return {
+        "status": "active",
+        "id_format": "HYP-XXXX (4-digit numerical)",
+        "stats": unique_id_generator.bloom_filter.get_stats()
+    }
+
 @app.post("/api/register", response_model=RegistrationResponse, status_code=status.HTTP_201_CREATED)
 def register_participant(data: ParticipantCreate):
     """
     Registers a new club participant into MongoDB Atlas and initiates payment order.
+    Generates a unique HYP-XXXX identifier verified via Bloom Filter for duplicacy.
     """
-    # Generate unique ticket / pass registration ID and Order ID
-    random_suffix = random.randint(1000, 9999)
+    from bloom_filter import unique_id_generator
+    # Generate unique ID in HYP-XXXX format using Bloom Filter
+    registration_id = unique_id_generator.generate_unique_id(
+        exists_in_db_fn=lambda cid: database.find_by_registration_id(cid) is not None
+    )
+
     order_suffix = random.randint(10000, 99999)
-    registration_id = f"UPES-CLUB-{data.sapid}-{random_suffix}"
-    order_id = f"ORD-{data.sapid}-{order_suffix}"
-    membership_fee = 299.0
+    order_id = f"ORD-{registration_id}-{order_suffix}"
+    membership_fee = 150.0
     
     doc = data.model_dump()
     doc["registration_id"] = registration_id
@@ -98,7 +120,7 @@ def register_participant(data: ParticipantCreate):
         inserted = database.insert_registration(doc)
         return RegistrationResponse(
             success=True,
-            message=f"Credentials verified for {data.name}! Proceeding to club fee payment.",
+            message=f"Credentials verified for {data.name}! Generated Unique ID: {registration_id}",
             registration_id=registration_id,
             order_id=order_id,
             amount=membership_fee,
@@ -110,9 +132,10 @@ def register_participant(data: ParticipantCreate):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @app.post("/api/verify-payment", response_model=PaymentVerificationResponse)
-def verify_payment(req: PaymentVerificationRequest):
+def verify_payment(req: PaymentVerificationRequest, background_tasks: BackgroundTasks):
     """
-    Verifies payment gateway transaction and updates participant record in MongoDB Atlas.
+    Verifies payment gateway transaction, updates participant record in MongoDB Atlas,
+    and dispatches the official Hypervision welcome email from upes.hypervision@stu.upes.ac.in.
     """
     # Generate simulated transaction ID if none provided
     txn_id = req.transaction_id or f"TXN-UPES-{random.randint(10000000, 99999999)}"
@@ -132,15 +155,60 @@ def verify_payment(req: PaymentVerificationRequest):
     if not updated:
         raise HTTPException(status_code=404, detail="Registration record not found for payment confirmation")
 
+    # Queue welcome email to be dispatched in background via official email
+    recipient_email = updated.get("college_email")
+    recipient_name = updated.get("name", "Hypervision Member")
+    sapid = updated.get("sapid", "")
+    current_year = updated.get("current_year", "1st Year")
+
+    if recipient_email:
+        background_tasks.add_task(
+            send_welcome_email,
+            recipient_email=recipient_email,
+            recipient_name=recipient_name,
+            unique_id=req.registration_id,
+            sapid=sapid,
+            current_year=current_year,
+            txn_id=txn_id
+        )
+
     return PaymentVerificationResponse(
         success=True,
-        message="Payment verified successfully! Your club registration is now active.",
+        message=f"Payment verified successfully! Welcome email sent to {recipient_email} with Unique ID {req.registration_id}.",
         transaction_id=txn_id,
         registration_id=req.registration_id,
         paid_at=now_iso,
         amount=req.amount,
-        participant=updated
+        participant=updated,
+        email_dispatched=True,
+        email_sender=OFFICIAL_EMAIL
     )
+
+@app.get("/api/smtp-status")
+def smtp_status():
+    """
+    Returns SMTP configuration details and whether live dispatch or simulation mode is active.
+    """
+    return get_smtp_status()
+
+@app.post("/api/resend-confirmation-email/{reg_id}")
+def resend_confirmation_email(reg_id: str):
+    """
+    Manually triggers / tests sending the welcome email for a specific registered member.
+    """
+    record = database.find_by_registration_id(reg_id)
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Member with ID '{reg_id}' not found.")
+    
+    result = send_welcome_email(
+        recipient_email=record.get("college_email"),
+        recipient_name=record.get("name"),
+        unique_id=record.get("registration_id"),
+        sapid=record.get("sapid"),
+        current_year=record.get("current_year", "1st Year"),
+        txn_id=record.get("transaction_id", "TXN-UPES-CONFIRMED")
+    )
+    return result
 
 @app.get("/api/registrations")
 def list_registrations(
