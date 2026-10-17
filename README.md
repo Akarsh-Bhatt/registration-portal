@@ -10,9 +10,11 @@ A club registration and checkout portal built with **React**, **Tailwind CSS**, 
 Captures all required student credentials with real-time validation:
 - **Name**: e.g., `Aarav Sharma`
 - **SAPID**: Exactly 9 digits (e.g., `590012345`) with real-time duplicate check
-- **College Email**: e.g., `aarav.12345@stu.upes.ac.in` with 1-click `+ @stu.upes.ac.in` assistant
+- **College Email**: e.g., `aarav.12345@stu.upes.ac.in`
 - **Phone Number**: 10-digit mobile number with validation
-- **Current Year**: Selection (`1st Year`, `2nd Year`, `3rd Year`, `4th Year`)
+- **Project Interests**: e.g., `Web Development`, `AI / Machine Learning`, `Cloud & DevOps`, etc.
+- **LinkedIn Profile**: e.g., `https://linkedin.com/in/username`
+- **GitHub Profile**: e.g., `https://github.com/username`
 - **HYPEXXXX Unique ID with Bloom Filter**:
   - Every registered participant is allocated a unique identifier formatted as `HYPEXXXX` (where `XXXX` is a 4-digit number, e.g. `HYPE4600`, `HYPE8155`).
   - Utilizes an in-memory **Bloom Filter** ($m = 65536$ bits, $k = 5$ hash functions) to check for duplicacy with zero false negatives prior to database persistence.

@@ -22,6 +22,13 @@
   }
 }
 
+/* Custom Cosmic Cursor: hide default cursor on fine pointer desktop devices */
+@media (pointer: fine) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+}
+
 .font-sora { font-family: var(--font-sora); }
 .font-outfit { font-family: var(--font-outfit); }
 .font-mono { font-family: var(--font-mono); }
