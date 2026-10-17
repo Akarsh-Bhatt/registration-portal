@@ -13,16 +13,15 @@ Captures all required student credentials with real-time validation:
 - **College Email**: e.g., `aarav.12345@stu.upes.ac.in` with 1-click `+ @stu.upes.ac.in` assistant
 - **Phone Number**: 10-digit mobile number with validation
 - **Current Year**: Selection (`1st Year`, `2nd Year`, `3rd Year`, `4th Year`)
-- **HYP-XXXX Unique ID with Bloom Filter**:
-  - Every registered participant is allocated a unique identifier formatted as `HYP-XXXX` (where `XXXX` is a 4-digit number, e.g. `HYP-4600`, `HYP-8155`).
+- **HYPEXXXX Unique ID with Bloom Filter**:
+  - Every registered participant is allocated a unique identifier formatted as `HYPEXXXX` (where `XXXX` is a 4-digit number, e.g. `HYPE4600`, `HYPE8155`).
   - Utilizes an in-memory **Bloom Filter** ($m = 65536$ bits, $k = 5$ hash functions) to check for duplicacy with zero false negatives prior to database persistence.
 
 ---
 
 ### 2. Integrated Payment Gateway Page (`pages/pg2`)
 Opens immediately upon submitting credentials with verified order summary:
-- **Unique Member ID**: Bloom Filter-verified `HYP-XXXX` displayed on order & receipt
-- **Order ID**: e.g., `ORD-HYP-XXXX-XXXXX`
+- **Order ID**: e.g., `ORD-HYP-XXXXXX`
 - **Credentials Review**: Confirms the student's Name, SAP ID, Email, Phone, and Academic Year
 - **Total Payable**: ₹150.00
 - **Payment Methods Supported**:
@@ -36,7 +35,7 @@ Opens immediately upon submitting credentials with verified order summary:
 
 ### 3. Registration Complete (`pages/pg3`)
 - Displays celebratory hero with "Registration complete!! Welcome to Hypervision"
-- Verified Member Holographic Showcase showing `HYP-XXXX` Unique ID and confirmation badge
+- Verified Member Holographic Showcase showing `HYPEXXXX` Unique ID and confirmation badge
 - Print / Save Receipt and "Register Another Member" actions.
 
 ---
@@ -122,7 +121,7 @@ The backend includes an official SMTP messaging pipeline sending congratulatory 
 - **Recipient**: The candidate's registered college email (e.g. `aarav.12345@stu.upes.ac.in`)
 - **Email Content**:
   - Congratulates the recipient on joining the Hypervision family.
-  - Prominently showcases their **Bloom Filter-verified Unique Member ID (`HYP-XXXX`)**.
+  - Prominently showcases their **Bloom Filter-verified Unique Member ID (`HYPEXXXX`)**.
   - Includes a full membership summary (SAP ID, Academic Year, Transaction Reference).
   - Outlines upcoming flagship hackathons, astronomy labs, and project bootcamps.
   - Includes both responsive Cosmic Lumina HTML template and plain-text fallback.

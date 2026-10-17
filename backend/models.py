@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Union
 import re
 from pydantic import BaseModel, Field, field_validator
 
@@ -65,9 +65,9 @@ class ParticipantCreate(BaseModel):
 
 class ParticipantRecord(ParticipantCreate):
     id: str
-    registration_id: str
-    created_at: datetime
-    status: str = "Confirmed"
+    registration_id: Optional[str] = None
+    created_at: Union[datetime, str]
+    status: str = "Pending Payment"
     payment_status: str = "Pending"
     order_id: Optional[str] = None
     transaction_id: Optional[str] = None
@@ -78,14 +78,14 @@ class ParticipantRecord(ParticipantCreate):
 class RegistrationResponse(BaseModel):
     success: bool
     message: str
-    registration_id: str
+    registration_id: Optional[str] = None
     order_id: str
     amount: float = 150.0
     participant: Optional[ParticipantRecord] = None
 
 class PaymentVerificationRequest(BaseModel):
-    registration_id: str
     order_id: str
+    registration_id: Optional[str] = None
     payment_method: str = "UPI"
     amount: float = 150.0
     transaction_id: Optional[str] = None
@@ -95,6 +95,7 @@ class PaymentVerificationResponse(BaseModel):
     message: str
     transaction_id: str
     registration_id: str
+    order_id: Optional[str] = None
     paid_at: str
     amount: float
     participant: Optional[dict] = None

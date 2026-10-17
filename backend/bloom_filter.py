@@ -70,7 +70,7 @@ class BloomFilter:
 
 class UniqueIdGenerator:
     """
-    Generates 4-digit unique identifiers in the format HYP-XXXX (where XXXX is 1000-9999).
+    Generates 4-digit unique identifiers in the format HYPEXXXX (where XXXX is 1000-9999).
     Uses a Bloom Filter to test for duplicacy before allocating an ID.
     """
     def __init__(self, bloom_filter: Optional[BloomFilter] = None):
@@ -82,7 +82,7 @@ class UniqueIdGenerator:
         """
         count = 0
         for rid in ids:
-            if rid and rid.startswith("HYP-"):
+            if rid and (rid.startswith("HYPE") or rid.startswith("HYP-")):
                 self.bloom_filter.add(rid)
                 count += 1
         logger.info(f"Bloom Filter synchronized with {count} existing Unique IDs.")
@@ -94,7 +94,7 @@ class UniqueIdGenerator:
         max_attempts: int = 10000
     ) -> str:
         """
-        Generates a new HYP-XXXX Unique ID.
+        Generates a new HYPEXXXX Unique ID.
         Checks Bloom Filter for duplicacy. If the Bloom Filter indicates a match,
         the candidate is flagged and a new candidate is generated.
         """
@@ -103,7 +103,7 @@ class UniqueIdGenerator:
             attempts += 1
             # Generate 4-digit numerical number (1000 to 9999)
             number = random.randint(1000, 9999)
-            candidate = f"HYP-{number}"
+            candidate = f"HYPE{number}"
 
             # Step 1: Check Bloom Filter for duplicacy
             if candidate in self.bloom_filter:
@@ -123,7 +123,7 @@ class UniqueIdGenerator:
             logger.info(f"Generated verified Unique ID '{candidate}' using Bloom Filter in {attempts} attempt(s).")
             return candidate
 
-        raise RuntimeError("Exhausted all attempts generating a unique HYP-XXXX ID. Range full.")
+        raise RuntimeError("Exhausted all attempts generating a unique HYPEXXXX ID. Range full.")
 
 # Singleton instance
 unique_id_generator = UniqueIdGenerator()

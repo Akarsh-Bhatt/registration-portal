@@ -7,11 +7,18 @@
     --font-mono: 'Space Grotesk', monospace;
   }
 
+  html {
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+  }
+
   body {
     font-family: var(--font-outfit);
-    background-color: #0A071B;
-    color: #E7DFF3;
+    background-color: #020612;
+    color: #F1F5F9;
     overflow-x: hidden;
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
   }
 }
 
@@ -19,9 +26,9 @@
 .font-outfit { font-family: var(--font-outfit); }
 .font-mono { font-family: var(--font-mono); }
 
-/* Cosmic Gradient Text */
+/* Cosmic Gradient Text - Electric Azure & Polar Ice */
 .cosmic-text-gradient {
-  background: linear-gradient(135deg, #FFFFFF 0%, #deb7ff 30%, #7df4ff 60%, #9900ff 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #BAE6FD 30%, #38BDF8 60%, #1D4ED8 100%);
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -34,47 +41,48 @@
   100% { background-position: 0% 50%; }
 }
 
-/* Animated Button Pulsing Border */
+/* Animated Button Pulsing Border - Electric Cobalt Glow */
 .btn-cosmic-glow {
   position: relative;
-  background: linear-gradient(135deg, #6823C3 0%, #007BFF 50%, #9900FF 100%);
+  background: linear-gradient(135deg, #0A255C 0%, #1D4ED8 50%, #2563EB 100%);
   background-size: 200% 200%;
   animation: gradientShift 4s ease infinite;
-  box-shadow: 0 0 24px rgba(153, 0, 255, 0.5), 0 0 48px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 24px rgba(29, 78, 216, 0.55), 0 0 48px rgba(56, 189, 248, 0.3);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-cosmic-glow:hover {
   transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 0 35px rgba(153, 0, 255, 0.8), 0 0 65px rgba(0, 238, 252, 0.6);
+  box-shadow: 0 0 35px rgba(37, 99, 235, 0.85), 0 0 65px rgba(56, 189, 248, 0.65);
 }
 .btn-cosmic-glow:active {
   transform: translateY(0) scale(0.99);
 }
 
-/* Glass card container */
+/* Glass card container - Deep Midnight Navy Glass */
 .glass-card {
-  background: rgba(21, 17, 31, 0.7);
+  background: rgba(4, 11, 28, 0.78);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(153, 0, 255, 0.22);
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(29, 78, 216, 0.12);
 }
 
-/* Floating Criteria Glass Cards */
+/* Floating Criteria Glass Cards - Cosmic Blue */
 .criteria-box {
-  background: rgba(15, 12, 25, 0.68);
+  background: rgba(5, 13, 33, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top-color: rgba(153, 0, 255, 0.35);
-  border-bottom-color: rgba(0, 238, 252, 0.15);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 15px rgba(104, 35, 195, 0.08);
+  border-top-color: rgba(37, 99, 235, 0.4);
+  border-bottom-color: rgba(56, 189, 248, 0.2);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 15px rgba(29, 78, 216, 0.12);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
   animation-fill-mode: forwards;
 }
 .criteria-box:hover {
   transform: translateY(-4px) scale(1.008);
-  border-color: rgba(0, 238, 252, 0.5);
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 238, 252, 0.25), 0 0 10px rgba(153, 0, 255, 0.35);
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.75), 0 0 25px rgba(56, 189, 248, 0.3), 0 0 12px rgba(37, 99, 235, 0.4);
 }
 
 /* Cascade Reveal Animations on Load */
@@ -131,3 +139,10 @@
 .float-anim {
   animation: float 5s ease-in-out infinite;
 }
+
+/* Static Footer Stability */
+footer {
+  position: static !important;
+  transform: none !important;
+}
+

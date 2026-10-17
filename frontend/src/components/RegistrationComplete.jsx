@@ -2,7 +2,7 @@ import React from 'react';
 import { RefreshCw } from 'lucide-react';
 
 export default function RegistrationComplete({ receipt, orderData, onRegisterAnother }) {
-  const uniqueId = receipt?.registration_id || orderData?.registration_id || 'HYP-1024';
+  const uniqueId = receipt?.registration_id || receipt?.participant?.registration_id || orderData?.registration_id || 'HYPE0000';
   const participant = orderData?.participant || {
     name: 'Aarav Sharma',
     sapid: '590012345',
@@ -20,13 +20,13 @@ export default function RegistrationComplete({ receipt, orderData, onRegisterAno
           
           {/* Celebration Hero Banner from pg3 */}
           <section className="flex flex-col items-center text-center relative pt-2">
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-gradient-to-tr from-[#9900ff]/25 via-[#00eefc]/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-gradient-to-tr from-[#1d4ed8]/30 via-[#38bdf8]/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
             <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-3 shadow-[0_0_25px_rgba(16,185,129,0.3)]">
               <span className="material-symbols-outlined text-3xl">verified</span>
             </div>
 
-            <div className="text-2xl sm:text-3xl font-sora font-semibold text-[#00EEFC] tracking-wide mt-2">
+            <div className="text-2xl sm:text-3xl font-sora font-semibold text-[#38BDF8] tracking-wide mt-2">
               Registration complete!!
             </div>
             <div className="text-gray-300 font-outfit text-base sm:text-lg mt-1">
@@ -34,7 +34,7 @@ export default function RegistrationComplete({ receipt, orderData, onRegisterAno
             </div>
 
             {/* Unique ID Badge */}
-            <div className="mt-6 inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-[#15111F]/90 border border-[#00EEFC]/40 shadow-[0_0_25px_rgba(0,238,252,0.25)]">
+            <div className="mt-6 inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-[#06112a]/90 border border-[#38BDF8]/40 shadow-[0_0_25px_rgba(56,189,248,0.3)]">
               <span className="text-xs font-mono uppercase tracking-wider text-gray-400">Unique Member ID:</span>
               <span className="font-mono font-black text-xl text-white tracking-widest">
                 {uniqueId}
@@ -45,14 +45,14 @@ export default function RegistrationComplete({ receipt, orderData, onRegisterAno
           {/* Membership Confirmation Card from pg3 */}
           <section className="flex flex-col items-center">
             <div className="w-full max-w-2xl relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#9900ff] via-[#00eefc] to-[#007bff] rounded-3xl blur-xl opacity-40 group-hover:opacity-70 transition duration-1000 -z-10" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#0c2356] via-[#1d4ed8] to-[#38bdf8] rounded-3xl blur-xl opacity-40 group-hover:opacity-70 transition duration-1000 -z-10" />
 
-              <div className="glass-card rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.85)] border border-purple-500/30 relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#6823C3] via-[#007BFF] to-[#00EEFC]" />
+              <div className="glass-card rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.85)] border border-blue-500/30 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0c2356] via-[#1d4ed8] to-[#38bdf8]" />
 
-                <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                <div className="flex items-center justify-between pb-4 border-b border-blue-900/30">
                   <div className="flex items-center gap-2.5">
-                    <span className="material-symbols-outlined text-2xl text-[#00EEFC]">badge</span>
+                    <span className="material-symbols-outlined text-2xl text-[#38BDF8]">badge</span>
                     <div>
                       <h3 className="font-sora font-bold text-lg text-white">Membership Confirmation</h3>
                       <p className="text-xs text-gray-400 font-mono">UPES Student Chapter • 2026</p>
@@ -64,32 +64,32 @@ export default function RegistrationComplete({ receipt, orderData, onRegisterAno
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="p-3.5 rounded-xl bg-[#0F0C19]/80 border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-[#03091e]/85 border border-blue-950/50">
                     <span className="text-gray-400 block text-[11px] uppercase">Candidate Name</span>
                     <span className="text-white font-bold text-sm">{participant.name}</span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#0F0C19]/80 border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-[#03091e]/85 border border-blue-950/50">
                     <span className="text-gray-400 block text-[11px] uppercase">SAP ID</span>
-                    <span className="text-[#00EEFC] font-bold text-sm">{participant.sapid}</span>
+                    <span className="text-[#38BDF8] font-bold text-sm">{participant.sapid}</span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#0F0C19]/80 border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-[#03091e]/85 border border-blue-950/50">
                     <span className="text-gray-400 block text-[11px] uppercase">College Email</span>
                     <span className="text-gray-200 truncate block">{participant.college_email}</span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#0F0C19]/80 border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-[#03091e]/85 border border-blue-950/50">
                     <span className="text-gray-400 block text-[11px] uppercase">Phone Number</span>
                     <span className="text-gray-200">+91 {participant.phone}</span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#0F0C19]/80 border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-[#03091e]/85 border border-blue-950/50">
                     <span className="text-gray-400 block text-[11px] uppercase">Academic Year</span>
-                    <span className="text-[#deb7ff] font-bold">{participant.current_year}</span>
+                    <span className="text-[#93c5fd] font-bold">{participant.current_year}</span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#0F0C19]/80 border border-white/10">
+                  <div className="p-3.5 rounded-xl bg-[#03091e]/85 border border-blue-950/50">
                     <span className="text-gray-400 block text-[11px] uppercase">Transaction Reference</span>
                     <span className="text-emerald-400 font-bold truncate block">{txnId}</span>
                   </div>
@@ -99,7 +99,7 @@ export default function RegistrationComplete({ receipt, orderData, onRegisterAno
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-3 pt-2">
                   <button
                     onClick={onRegisterAnother}
-                    className="btn-cosmic-glow flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-sora font-bold tracking-wide uppercase transition-all cursor-pointer shadow-[0_0_20px_rgba(0,238,252,0.3)]"
+                    className="btn-cosmic-glow flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-sora font-bold tracking-wide uppercase transition-all cursor-pointer shadow-[0_0_20px_rgba(56,189,248,0.35)]"
                   >
                     <RefreshCw className="w-4 h-4" />
                     <span>Register Another Member</span>

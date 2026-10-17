@@ -83,12 +83,12 @@ def check_sapid(sapid: str):
 @app.get("/api/bloom-filter-stats")
 def get_bloom_stats():
     """
-    Returns Bloom Filter metrics and status for HYP-XXXX ID generation.
+    Returns Bloom Filter metrics and status for HYPEXXXX ID generation.
     """
     from bloom_filter import unique_id_generator
     return {
         "status": "active",
-        "id_format": "HYP-XXXX (4-digit numerical)",
+        "id_format": "HYPEXXXX (4-digit numerical)",
         "stats": unique_id_generator.bloom_filter.get_stats()
     }
 
@@ -96,20 +96,14 @@ def get_bloom_stats():
 def register_participant(data: ParticipantCreate):
     """
     Registers a new club participant into MongoDB Atlas and initiates payment order.
-    Generates a unique HYP-XXXX identifier verified via Bloom Filter for duplicacy.
+    The official Unique Hypervision ID (HYPEXXXX) will be assigned after payment confirmation.
     """
-    from bloom_filter import unique_id_generator
-    # Generate unique ID in HYP-XXXX format using Bloom Filter
-    registration_id = unique_id_generator.generate_unique_id(
-        exists_in_db_fn=lambda cid: database.find_by_registration_id(cid) is not None
-    )
-
-    order_suffix = random.randint(10000, 99999)
-    order_id = f"ORD-{registration_id}-{order_suffix}"
+    order_suffix = random.randint(100000, 999999)
+    order_id = f"ORD-HYP-{order_suffix}"
     membership_fee = 150.0
     
     doc = data.model_dump()
-    doc["registration_id"] = registration_id
+    doc["registration_id"] = None  # Assigned ONLY after payment confirmation from gateway
     doc["order_id"] = order_id
     doc["payment_status"] = "Pending"
     doc["amount_due"] = membership_fee
@@ -120,8 +114,8 @@ def register_participant(data: ParticipantCreate):
         inserted = database.insert_registration(doc)
         return RegistrationResponse(
             success=True,
-            message=f"Credentials verified for {data.name}! Generated Unique ID: {registration_id}",
-            registration_id=registration_id,
+            message=f"Details verified for {data.name}! Please complete payment to receive your official Hypervision ID.",
+            registration_id=None,
             order_id=order_id,
             amount=membership_fee,
             participant=ParticipantRecord(**inserted)
@@ -134,17 +128,41 @@ def register_participant(data: ParticipantCreate):
 @app.post("/api/verify-payment", response_model=PaymentVerificationResponse)
 def verify_payment(req: PaymentVerificationRequest, background_tasks: BackgroundTasks):
     """
-    Verifies payment gateway transaction, updates participant record in MongoDB Atlas,
+    Verifies payment gateway transaction, assigns verified Unique Hypervision ID (HYPEXXXX)
+    via Bloom Filter upon payment confirmation, updates participant record in MongoDB Atlas,
     and dispatches the official Hypervision welcome email from upes.hypervision@stu.upes.ac.in.
     """
+    from bloom_filter import unique_id_generator
+
+    # 1. Look up existing registration by order_id or registration_id
+    record = None
+    if req.order_id:
+        record = database.find_by_order_id(req.order_id)
+    if not record and req.registration_id:
+        record = database.find_by_registration_id(req.registration_id)
+
+    if not record:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Registration record not found for Order ID: {req.order_id}"
+        )
+
+    # 2. Assign Unique Hypervision ID ONLY AFTER payment confirmation from gateway!
+    unique_id = record.get("registration_id")
+    if not unique_id:
+        unique_id = unique_id_generator.generate_unique_id(
+            exists_in_db_fn=lambda cid: database.find_by_registration_id(cid) is not None
+        )
+
     # Generate simulated transaction ID if none provided
     txn_id = req.transaction_id or f"TXN-UPES-{random.randint(10000000, 99999999)}"
     now_iso = datetime.now().isoformat()
 
     updated = database.update_payment_record(
-        req.registration_id,
+        req.order_id or req.registration_id,
         {
             "order_id": req.order_id,
+            "registration_id": unique_id,
             "transaction_id": txn_id,
             "amount": req.amount,
             "payment_method": req.payment_method,
@@ -153,7 +171,7 @@ def verify_payment(req: PaymentVerificationRequest, background_tasks: Background
     )
 
     if not updated:
-        raise HTTPException(status_code=404, detail="Registration record not found for payment confirmation")
+        raise HTTPException(status_code=500, detail="Failed to update registration record after payment")
 
     # Queue welcome email to be dispatched in background via official email
     recipient_email = updated.get("college_email")
@@ -166,7 +184,7 @@ def verify_payment(req: PaymentVerificationRequest, background_tasks: Background
             send_welcome_email,
             recipient_email=recipient_email,
             recipient_name=recipient_name,
-            unique_id=req.registration_id,
+            unique_id=unique_id,
             sapid=sapid,
             current_year=current_year,
             txn_id=txn_id
@@ -174,9 +192,10 @@ def verify_payment(req: PaymentVerificationRequest, background_tasks: Background
 
     return PaymentVerificationResponse(
         success=True,
-        message=f"Payment verified successfully! Welcome email sent to {recipient_email} with Unique ID {req.registration_id}.",
+        message=f"Payment verified successfully! Welcome to Hypervision! Assigned Member ID: {unique_id}. Welcome email sent to {recipient_email}.",
         transaction_id=txn_id,
-        registration_id=req.registration_id,
+        registration_id=unique_id,
+        order_id=req.order_id,
         paid_at=now_iso,
         amount=req.amount,
         participant=updated,
@@ -196,14 +215,21 @@ def resend_confirmation_email(reg_id: str):
     """
     Manually triggers / tests sending the welcome email for a specific registered member.
     """
-    record = database.find_by_registration_id(reg_id)
+    record = database.find_by_registration_id(reg_id) or database.find_by_order_id(reg_id)
     if not record:
         raise HTTPException(status_code=404, detail=f"Member with ID '{reg_id}' not found.")
     
+    unique_id = record.get("registration_id")
+    if not unique_id:
+        raise HTTPException(
+            status_code=400, 
+            detail="Cannot send welcome email: Member has not completed payment and has no Unique ID assigned."
+        )
+
     result = send_welcome_email(
         recipient_email=record.get("college_email"),
         recipient_name=record.get("name"),
-        unique_id=record.get("registration_id"),
+        unique_id=unique_id,
         sapid=record.get("sapid"),
         current_year=record.get("current_year", "1st Year"),
         txn_id=record.get("transaction_id", "TXN-UPES-CONFIRMED")

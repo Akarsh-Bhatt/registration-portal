@@ -52,7 +52,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen font-outfit text-[#E7DFF3] antialiased selection:bg-[#9900FF] selection:text-white flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen font-outfit text-[#F1F5F9] antialiased selection:bg-[#1D4ED8] selection:text-white flex flex-col relative overflow-x-hidden">
       
       {/* Cosmic Background WebGL Animation from pages/animation */}
       <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
