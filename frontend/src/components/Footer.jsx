@@ -1,6 +1,5 @@
 import React from 'react';
-
-const HYPERVISION_LOGO = "https://lh3.googleusercontent.com/aida-public/AB6AXuBXpbEmeI7CgRPZXYElnHDRETlCo0Pd2bwbTpXvEzRb6mrikyUy_83Rn8YAhOpmHjiHJ00RpJbSc3NNOBd4LTnGWKZ781fYl5VjWwjQcxKokCit2ey3yFI2ocwsHNGYMSv4IedirFyYRRpjcejE2s84qlrcFCmUGkkOme3NwPd6kRNXvD4adAtARrCRfYOPoEcfhGj57FPDcFQSTvVmZXGIyzyZxmQ6VNMraEmgkDIZlbiGyyQpZHzCzW-9hmCBU0r9rQ";
+import hypervisionLogo from '../assets/logo.png';
 
 export default function Footer({ onOpenAtlasModal }) {
   return (
@@ -12,8 +11,8 @@ export default function Footer({ onOpenAtlasModal }) {
           <div className="flex items-center justify-center md:justify-start gap-2">
             <img
               alt="Hypervision Logo"
-              className="h-9 w-auto object-contain"
-              src={HYPERVISION_LOGO}
+              className="h-9 w-auto object-contain drop-shadow-[0_0_10px_rgba(0,238,252,0.4)]"
+              src={hypervisionLogo}
             />
             <span className="font-sora font-bold text-sm text-white uppercase tracking-tight">
               hypervision
@@ -59,13 +58,6 @@ export default function Footer({ onOpenAtlasModal }) {
               mail
             </span>
           </a>
-
-          <button
-            onClick={onOpenAtlasModal}
-            className="text-[11px] font-mono text-purple-400 hover:text-[#00EEFC] underline transition-colors cursor-pointer ml-2"
-          >
-            MongoDB Atlas Config
-          </button>
         </div>
 
         {/* Copyright */}

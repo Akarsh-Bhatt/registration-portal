@@ -1,5 +1,5 @@
 import React from 'react';
-import { Printer, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 export default function RegistrationComplete({ receipt, orderData, onRegisterAnother }) {
   const uniqueId = receipt?.registration_id || orderData?.registration_id || 'HYP-1024';
@@ -38,9 +38,6 @@ export default function RegistrationComplete({ receipt, orderData, onRegisterAno
               <span className="text-xs font-mono uppercase tracking-wider text-gray-400">Unique Member ID:</span>
               <span className="font-mono font-black text-xl text-white tracking-widest">
                 {uniqueId}
-              </span>
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">
-                Bloom Filter Verified
               </span>
             </div>
           </section>
@@ -98,20 +95,8 @@ export default function RegistrationComplete({ receipt, orderData, onRegisterAno
                   </div>
                 </div>
 
-                <div className="mt-6 p-3 rounded-xl bg-[#0F0C19]/60 border border-white/5 text-[11px] font-outfit text-gray-400 text-center">
-                  Your credentials have been securely stored in the <strong className="text-[#00EEFC]">MongoDB Atlas</strong> database. You will receive an orientation invite via WhatsApp.
-                </div>
-
                 {/* Actions */}
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-3 pt-2">
-                  <button
-                    onClick={() => window.print()}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#15111F] hover:bg-[#1D1A27] border border-white/15 text-gray-200 text-xs font-mono font-semibold transition-all cursor-pointer"
-                  >
-                    <Printer className="w-4 h-4 text-[#00EEFC]" />
-                    <span>Print Receipt</span>
-                  </button>
-
                   <button
                     onClick={onRegisterAnother}
                     className="btn-cosmic-glow flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-sora font-bold tracking-wide uppercase transition-all cursor-pointer shadow-[0_0_20px_rgba(0,238,252,0.3)]"

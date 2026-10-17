@@ -98,6 +98,8 @@ class PaymentVerificationResponse(BaseModel):
     paid_at: str
     amount: float
     participant: Optional[dict] = None
+    email_dispatched: Optional[bool] = True
+    email_sender: Optional[str] = "upes.hypervision@stu.upes.ac.in"
 
 class StatsResponse(BaseModel):
     total_registrations: int

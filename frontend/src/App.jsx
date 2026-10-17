@@ -4,7 +4,7 @@ import RegistrationForm from './components/RegistrationForm';
 import PaymentGateway from './components/PaymentGateway';
 import RegistrationComplete from './components/RegistrationComplete';
 import Footer from './components/Footer';
-import CosmicShader from './components/CosmicShader';
+import CosmicAnimation from './components/CosmicAnimation';
 import AtlasConfigModal from './components/AtlasConfigModal';
 
 export default function App() {
@@ -52,10 +52,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A071B] font-outfit text-[#E7DFF3] antialiased selection:bg-[#9900FF] selection:text-white flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen font-outfit text-[#E7DFF3] antialiased selection:bg-[#9900FF] selection:text-white flex flex-col relative overflow-x-hidden">
       
-      {/* Interactive WebGL Shader Canvas from pages design */}
-      <CosmicShader />
+      {/* Cosmic Background WebGL Animation from pages/animation */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
+        <CosmicAnimation />
+      </div>
 
       {/* Persistent Top Navigation Bar from pages design */}
       <Navbar
@@ -65,7 +67,7 @@ export default function App() {
       />
 
       {/* Step Router: pg1 (Registration) -> pg2 (Payment) -> pg3 (Complete) */}
-      <div className="flex-1">
+      <div className="flex-1 relative z-10">
         {currentStep === 'register' && (
           <RegistrationForm onProceedToPayment={handleProceedToPayment} />
         )}

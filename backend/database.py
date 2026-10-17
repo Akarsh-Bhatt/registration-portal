@@ -232,7 +232,7 @@ def update_payment_record(reg_id: str, payment_info: Dict[str, Any]) -> Optional
         "payment_status": "Paid",
         "order_id": payment_info.get("order_id"),
         "transaction_id": payment_info.get("transaction_id"),
-        "amount_paid": payment_info.get("amount", 299.0),
+        "amount_paid": payment_info.get("amount", 150.0),
         "payment_method": payment_info.get("payment_method", "UPI"),
         "paid_at": datetime.now().isoformat()
     }

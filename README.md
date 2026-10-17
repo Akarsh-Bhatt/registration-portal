@@ -13,7 +13,6 @@ Captures all required student credentials with real-time validation:
 - **College Email**: e.g., `aarav.12345@stu.upes.ac.in` with 1-click `+ @stu.upes.ac.in` assistant
 - **Phone Number**: 10-digit mobile number with validation
 - **Current Year**: Selection (`1st Year`, `2nd Year`, `3rd Year`, `4th Year`)
-- **⚡ 1-Click Quick Fill**: Demo button to populate `Aarav Sharma`'s credentials with 1 click.
 - **HYP-XXXX Unique ID with Bloom Filter**:
   - Every registered participant is allocated a unique identifier formatted as `HYP-XXXX` (where `XXXX` is a 4-digit number, e.g. `HYP-4600`, `HYP-8155`).
   - Utilizes an in-memory **Bloom Filter** ($m = 65536$ bits, $k = 5$ hash functions) to check for duplicacy with zero false negatives prior to database persistence.
@@ -110,4 +109,32 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
    MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
    DB_NAME=upes_club_portal
    ```
-   *Alternatively, click the **"Atlas Ready"** badge in the top-right corner of the website and paste it directly into the modal!*
+   *Your credentials will automatically connect to MongoDB Atlas on backend startup.*
+
+---
+
+## 📧 Official Hypervision SMTP Email System
+
+The backend includes an official SMTP messaging pipeline sending congratulatory welcome emails to new members upon payment confirmation:
+
+- **Official Sender**: `upes.hypervision@stu.upes.ac.in`
+- **Sender Display Name**: `UPES Hypervision Chapter`
+- **Recipient**: The candidate's registered college email (e.g. `aarav.12345@stu.upes.ac.in`)
+- **Email Content**:
+  - Congratulates the recipient on joining the Hypervision family.
+  - Prominently showcases their **Bloom Filter-verified Unique Member ID (`HYP-XXXX`)**.
+  - Includes a full membership summary (SAP ID, Academic Year, Transaction Reference).
+  - Outlines upcoming flagship hackathons, astronomy labs, and project bootcamps.
+  - Includes both responsive Cosmic Lumina HTML template and plain-text fallback.
+
+### Configuring Live SMTP Transmission in `backend/.env`:
+```env
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+SMTP_USER=upes.hypervision@stu.upes.ac.in
+SMTP_PASSWORD=your_office365_or_app_password
+SMTP_FROM_EMAIL=upes.hypervision@stu.upes.ac.in
+SMTP_FROM_NAME=UPES Hypervision Chapter
+SMTP_USE_TLS=true
+```
+*(If `SMTP_PASSWORD` is left empty, the system operates in simulation mode, logging the full formatted message to console and never interrupting user checkout).*

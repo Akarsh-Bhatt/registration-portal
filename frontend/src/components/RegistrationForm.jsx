@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, Zap } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 const YEAR_OPTIONS = [
   { id: '1st Year', label: '1st Year' },
@@ -22,20 +22,6 @@ export default function RegistrationForm({ onProceedToPayment }) {
   const [serverError, setServerError] = useState('');
   const [sapidChecking, setSapidChecking] = useState(false);
   const [sapidAlreadyRegistered, setSapidAlreadyRegistered] = useState(false);
-
-  // Quick fill sample data
-  const handleQuickFill = () => {
-    setFormData({
-      name: 'Aarav Sharma',
-      sapid: '590012345',
-      college_email: 'aarav.12345@stu.upes.ac.in',
-      phone: '9876543210',
-      current_year: '2nd Year'
-    });
-    setErrors({});
-    setServerError('');
-    setSapidAlreadyRegistered(false);
-  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -162,18 +148,6 @@ export default function RegistrationForm({ onProceedToPayment }) {
             </span>
             <span className="text-[#deb7ff] text-xs font-mono drop-shadow-[0_0_8px_rgba(222,183,255,0.6)]">✦</span>
           </div>
-
-          {/* Quick Fill Button */}
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={handleQuickFill}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#15111F]/90 hover:bg-[#1D1A27] border border-[#00EEFC]/30 text-[#00EEFC] text-xs font-mono font-medium transition-all shadow-sm cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>⚡ Fill Sample (Aarav Sharma • 590012345)</span>
-            </button>
-          </div>
         </section>
 
         {/* Centered Focal Registration Card from pg1 */}
@@ -190,9 +164,6 @@ export default function RegistrationForm({ onProceedToPayment }) {
                   Registration Form
                 </span>
               </div>
-              <span className="text-[11px] font-mono text-gray-400">
-                All fields marked with <span className="text-[#00EEFC]">*</span> are required
-              </span>
             </div>
 
             {serverError && (
@@ -408,11 +379,6 @@ export default function RegistrationForm({ onProceedToPayment }) {
                         </>
                       )}
                     </button>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-2 pt-1 text-center font-mono text-[11px] text-gray-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00EEFC] animate-pulse" />
-                    <span>Unique ID allocated via Bloom Filter deduplication</span>
                   </div>
                 </div>
               </div>

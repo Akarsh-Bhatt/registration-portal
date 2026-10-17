@@ -1,11 +1,7 @@
 import React from 'react';
-import { Database } from 'lucide-react';
+import hypervisionLogo from '../assets/logo.png';
 
-const HYPERVISION_LOGO = "https://lh3.googleusercontent.com/aida-public/AB6AXuBXpbEmeI7CgRPZXYElnHDRETlCo0Pd2bwbTpXvEzRb6mrikyUy_83Rn8YAhOpmHjiHJ00RpJbSc3NNOBd4LTnGWKZ781fYl5VjWwjQcxKokCit2ey3yFI2ocwsHNGYMSv4IedirFyYRRpjcejE2s84qlrcFCmUGkkOme3NwPd6kRNXvD4adAtARrCRfYOPoEcfhGj57FPDcFQSTvVmZXGIyzyZxmQ6VNMraEmgkDIZlbiGyyQpZHzCzW-9hmCBU0r9rQ";
-
-export default function Navbar({ currentStep, atlasStatus, onOpenAtlasModal }) {
-  const isAtlasOnline = atlasStatus?.connected_to_atlas;
-
+export default function Navbar({ currentStep }) {
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#0F0C19]/80 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
       <div className="h-24 max-w-[1240px] mx-auto px-6 flex items-center justify-between gap-4">
@@ -16,17 +12,14 @@ export default function Navbar({ currentStep, atlasStatus, onOpenAtlasModal }) {
             <div className="h-14 w-14 flex items-center justify-center">
               <img
                 alt="Hypervision Logo"
-                className="h-14 w-auto object-contain transition-transform group-hover:scale-105"
-                src={HYPERVISION_LOGO}
+                className="h-14 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_14px_rgba(0,238,252,0.45)]"
+                src={hypervisionLogo}
               />
             </div>
             <div className="flex flex-col justify-center">
               <div className="flex items-center gap-2">
                 <span className="font-sora font-extrabold text-2xl tracking-wider text-white uppercase">
                   hypervision
-                </span>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-purple-500/20 text-[#deb7ff] border border-purple-500/30 font-semibold tracking-wider uppercase hidden sm:inline-block">
-                  INNOVATE
                 </span>
               </div>
               <span className="font-mono text-sm font-semibold text-gray-400 tracking-widest uppercase inline-flex items-center gap-1.5 overflow-hidden">
@@ -57,22 +50,6 @@ export default function Navbar({ currentStep, atlasStatus, onOpenAtlasModal }) {
               <span className="font-semibold tracking-wider uppercase">Registration Verified</span>
             </div>
           )}
-
-          {/* MongoDB Atlas Pill */}
-          <button
-            onClick={onOpenAtlasModal}
-            title="Configure MongoDB Atlas Connection"
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono transition-all cursor-pointer ${
-              isAtlasOnline
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-                : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
-            }`}
-          >
-            <Database className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">
-              {isAtlasOnline ? 'Atlas Online' : 'Atlas Ready'}
-            </span>
-          </button>
 
         </div>
 
