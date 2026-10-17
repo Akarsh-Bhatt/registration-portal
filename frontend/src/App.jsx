@@ -6,6 +6,7 @@ import RegistrationComplete from './components/RegistrationComplete';
 import Footer from './components/Footer';
 import CosmicAnimation from './components/CosmicAnimation';
 import AtlasConfigModal from './components/AtlasConfigModal';
+import CustomCursor from './components/CustomCursor';
 
 export default function App() {
   const [atlasStatus, setAtlasStatus] = useState(null);
@@ -54,6 +55,9 @@ export default function App() {
   return (
     <div className="min-h-screen font-outfit text-[#F1F5F9] antialiased selection:bg-[#1D4ED8] selection:text-white flex flex-col relative overflow-x-hidden">
       
+      {/* Interactive Cosmic Custom Cursor for Desktop */}
+      <CustomCursor />
+
       {/* Cosmic Background WebGL Animation from pages/animation */}
       <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-0">
         <CosmicAnimation />

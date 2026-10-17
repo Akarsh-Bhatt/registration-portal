@@ -8,13 +8,25 @@ const YEAR_OPTIONS = [
   { id: '4th Year', label: '4th Year' }
 ];
 
+const INTEREST_OPTIONS = [
+  'Web Development',
+  'App Development',
+  'AI / Machine Learning',
+  'Data Science',
+  'Cybersecurity',
+  'Cloud & DevOps'
+];
+
 export default function RegistrationForm({ onProceedToPayment }) {
   const [formData, setFormData] = useState({
     name: '',
     sapid: '',
     college_email: '',
     phone: '',
-    current_year: '1st Year'
+    current_year: '1st Year',
+    interests: ['Web Development'],
+    linkedin: '',
+    github: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -22,6 +34,22 @@ export default function RegistrationForm({ onProceedToPayment }) {
   const [serverError, setServerError] = useState('');
   const [sapidChecking, setSapidChecking] = useState(false);
   const [sapidAlreadyRegistered, setSapidAlreadyRegistered] = useState(false);
+
+  const toggleInterest = (option) => {
+    setFormData(prev => {
+      const exists = prev.interests.includes(option);
+      let updated;
+      if (exists) {
+        updated = prev.interests.filter(item => item !== option);
+      } else {
+        updated = [...prev.interests, option];
+      }
+      return { ...prev, interests: updated };
+    });
+    if (errors.interests) {
+      setErrors(prev => ({ ...prev, interests: '' }));
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -90,6 +118,11 @@ export default function RegistrationForm({ onProceedToPayment }) {
       newErrors.current_year = 'Please select your current year of study';
     }
 
+    // 6. Project Interests
+    if (!formData.interests || formData.interests.length === 0) {
+      newErrors.interests = 'Please select at least one project interest';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -103,10 +136,16 @@ export default function RegistrationForm({ onProceedToPayment }) {
     setServerError('');
 
     try {
+      const payload = {
+        ...formData,
+        interest: formData.interests.join(', '),
+        interests: formData.interests
+      };
+
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
@@ -120,7 +159,7 @@ export default function RegistrationForm({ onProceedToPayment }) {
           registration_id: result.registration_id,
           order_id: result.order_id,
           amount: result.amount || 150.0,
-          participant: result.participant || formData
+          participant: result.participant || payload
         });
       }
 
@@ -256,19 +295,6 @@ export default function RegistrationForm({ onProceedToPayment }) {
                       <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
                         <span className="text-[#38BDF8] font-bold">03.</span> College Email ID <span className="text-[#38BDF8]">*</span>
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (formData.college_email && !formData.college_email.includes('@')) {
-                            handleInputChange('college_email', `${formData.college_email}@stu.upes.ac.in`);
-                          } else if (!formData.college_email) {
-                            handleInputChange('college_email', 'aarav.12345@stu.upes.ac.in');
-                          }
-                        }}
-                        className="text-[10px] font-mono text-[#38BDF8] hover:underline"
-                      >
-                        + @stu.upes.ac.in
-                      </button>
                     </div>
                     <div className="relative">
                       <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">
@@ -356,8 +382,105 @@ export default function RegistrationForm({ onProceedToPayment }) {
                 </div>
               </div>
 
-              {/* Criteria Box 6: Action CTA Button */}
+              {/* Criteria Box 6: Areas of Interest (Button Selection Format) */}
               <div className="cascade-item" style={{ animationDelay: '0.6s' }}>
+                <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
+                      <span className="text-[#60a5fa] font-bold">06.</span> Project Interests <span className="text-[#38BDF8]">*</span>
+                    </label>
+                    <span className="text-[11px] font-mono text-sky-400/90 font-medium">
+                      {formData.interests.length} selected
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                    {INTEREST_OPTIONS.map((option) => {
+                      const isSelected = formData.interests.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => toggleInterest(option)}
+                          className={`flex items-center justify-center p-3.5 rounded-xl cursor-pointer text-center transition-all ${
+                            isSelected
+                              ? 'bg-[#0a1a3f] border-2 border-[#38BDF8] shadow-[0_0_15px_rgba(56,189,248,0.35)]'
+                              : 'bg-[#050f26]/90 border border-blue-900/30 hover:border-blue-500/30'
+                          }`}
+                        >
+                          <span className={`font-sora text-xs font-semibold ${isSelected ? 'text-[#38BDF8]' : 'text-gray-200'}`}>
+                            {option}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {errors.interests && (
+                    <p className="text-[11px] text-rose-400 font-mono mt-0.5">{errors.interests}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Criteria Box 7 & 8: LinkedIn & GitHub Profiles */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                {/* 7. LinkedIn Profile */}
+                <div className="cascade-item" style={{ animationDelay: '0.7s' }}>
+                  <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
+                        <span className="text-[#38BDF8] font-bold">07.</span> LinkedIn
+                        <span className="text-[10px] text-gray-400 font-normal lowercase">(optional)</span>
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 flex items-center">
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                          <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m1.4 9.74v-8.37H5.06v8.37z" />
+                        </svg>
+                      </span>
+                      <input
+                        type="url"
+                        value={formData.linkedin}
+                        onChange={(e) => handleInputChange('linkedin', e.target.value)}
+                        placeholder="https://linkedin.com/in/username"
+                        className="w-full bg-[#03091e]/90 border border-white/15 text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/25 transition-all shadow-inner"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 8. GitHub Profile */}
+                <div className="cascade-item" style={{ animationDelay: '0.8s' }}>
+                  <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
+                        <span className="text-[#60a5fa] font-bold">08.</span> GitHub
+                        <span className="text-[10px] text-gray-400 font-normal lowercase">(optional)</span>
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 flex items-center">
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                        </svg>
+                      </span>
+                      <input
+                        type="url"
+                        value={formData.github}
+                        onChange={(e) => handleInputChange('github', e.target.value)}
+                        placeholder="https://github.com/username"
+                        className="w-full bg-[#03091e]/90 border border-white/15 text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/25 transition-all shadow-inner"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Criteria Box 9: Action CTA Button */}
+              <div className="cascade-item" style={{ animationDelay: '0.9s' }}>
                 <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
                   <div className="flex flex-col sm:flex-row items-center gap-4">
                     <button

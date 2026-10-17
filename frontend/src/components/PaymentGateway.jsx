@@ -346,6 +346,19 @@ export default function PaymentGateway({ orderData, onCancel, onPaymentComplete 
                       <span className="text-gray-400 font-mono">Tier:</span>
                       <span className="text-[#93c5fd] font-semibold">Member</span>
                     </div>
+
+                    {(participant.interest || participant.domain_interest || participant.interests) && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400 font-mono">Interests:</span>
+                        <span className="text-[#38BDF8] font-medium text-right truncate max-w-[210px]">
+                          {Array.isArray(participant.interests)
+                            ? participant.interests.join(', ')
+                            : Array.isArray(participant.interest)
+                            ? participant.interest.join(', ')
+                            : participant.interest || participant.domain_interest}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-2 pt-1">

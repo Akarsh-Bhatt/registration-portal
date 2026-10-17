@@ -103,6 +103,21 @@ def register_participant(data: ParticipantCreate):
     membership_fee = 150.0
     
     doc = data.model_dump()
+    raw_interest = doc.get("interests") or doc.get("interest") or doc.get("domain_interest") or ["Web Development"]
+    if isinstance(raw_interest, list):
+        doc["interests"] = raw_interest
+        doc["interest"] = ", ".join(raw_interest)
+        doc["domain_interest"] = ", ".join(raw_interest)
+    else:
+        doc["interest"] = str(raw_interest)
+        doc["domain_interest"] = str(raw_interest)
+        doc["interests"] = [s.strip() for s in str(raw_interest).split(",") if s.strip()]
+
+    if doc.get("github"):
+        doc["github_or_portfolio"] = doc["github"]
+    elif doc.get("github_or_portfolio"):
+        doc["github"] = doc["github_or_portfolio"]
+
     doc["registration_id"] = None  # Assigned ONLY after payment confirmation from gateway
     doc["order_id"] = order_id
     doc["payment_status"] = "Pending"

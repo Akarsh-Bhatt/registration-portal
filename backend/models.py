@@ -9,8 +9,12 @@ class ParticipantCreate(BaseModel):
     college_email: str = Field(..., description="College email, e.g., aarav.12345@stu.upes.ac.in")
     phone: str = Field(..., description="10-digit mobile number")
     current_year: str = Field(..., description="Current Year of study, e.g., 1st Year, 2nd Year")
+    interest: Optional[Union[List[str], str]] = Field(default="Web Development", description="Field of Interest / Domain")
+    interests: Optional[List[str]] = Field(default=None, description="List of chosen interests")
+    linkedin: Optional[str] = Field(default="", description="LinkedIn profile URL or handle")
+    github: Optional[str] = Field(default="", description="GitHub profile URL or handle")
     branch: Optional[str] = Field(default="B.Tech Computer Science", description="Degree and branch of study")
-    domain_interest: Optional[str] = Field(default="Technical & Web Development", description="Primary domain interest")
+    domain_interest: Optional[Union[List[str], str]] = Field(default="Web Development", description="Primary domain interest alias")
     why_join: Optional[str] = Field(default="", max_length=500, description="Brief statement on why you want to join")
     github_or_portfolio: Optional[str] = Field(default="", max_length=200, description="Portfolio or GitHub profile link")
 
