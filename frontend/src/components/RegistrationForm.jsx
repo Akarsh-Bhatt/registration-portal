@@ -137,30 +137,30 @@ export default function RegistrationForm({ onProceedToPayment }) {
         
         {/* Hero Header Section from pg1 */}
         <section className="flex flex-col items-center text-center pt-2 pb-8 max-w-3xl">
-          <h1 className="font-sora font-extrabold text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight cosmic-text-gradient drop-shadow-[0_0_40px_rgba(153,0,255,0.4)] max-w-4xl text-center">
+          <h1 className="font-sora font-extrabold text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight cosmic-text-gradient drop-shadow-[0_0_40px_rgba(37,99,235,0.45)] max-w-4xl text-center">
             Register for Hypervision
           </h1>
           
-          <div className="inline-flex items-center gap-3 mt-4 px-4 py-1.5 rounded-full bg-[#15111F]/80 border border-white/10 backdrop-blur-md shadow-[0_0_20px_rgba(153,0,255,0.15)]">
-            <span className="text-[#00EEFC] text-xs font-mono drop-shadow-[0_0_8px_rgba(0,238,252,0.6)]">✦</span>
-            <span className="font-mono text-xs sm:text-[13px] uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#deb7ff] via-white to-[#7df4ff] font-medium drop-shadow-[0_0_12px_rgba(0,238,252,0.3)]">
+          <div className="inline-flex items-center gap-3 mt-4 px-4 py-1.5 rounded-full bg-[#06112a]/85 border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+            <span className="text-[#38BDF8] text-xs font-mono drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]">✦</span>
+            <span className="font-mono text-xs sm:text-[13px] uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#BAE6FD] via-white to-[#38BDF8] font-medium drop-shadow-[0_0_12px_rgba(56,189,248,0.3)]">
               Begin your Journey
             </span>
-            <span className="text-[#deb7ff] text-xs font-mono drop-shadow-[0_0_8px_rgba(222,183,255,0.6)]">✦</span>
+            <span className="text-[#38BDF8] text-xs font-mono drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]">✦</span>
           </div>
         </section>
 
         {/* Centered Focal Registration Card from pg1 */}
         <div className="w-full max-w-3xl mx-auto" id="register">
-          <div className="glass-card rounded-3xl p-6 sm:p-9 shadow-[0_20px_60px_rgba(0,0,0,0.85)] relative overflow-hidden border border-purple-500/30">
+          <div className="glass-card rounded-3xl p-6 sm:p-9 shadow-[0_20px_60px_rgba(0,0,0,0.85)] relative overflow-hidden border border-blue-500/30">
             
             {/* Shimmering Top Accent Border Bar */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#6823C3] via-[#007BFF] to-[#00EEFC]" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0c2356] via-[#1d4ed8] to-[#38bdf8]" />
 
             {/* Form Header */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-blue-900/30">
               <div>
-                <span className="font-mono text-xs uppercase tracking-widest text-[#deb7ff] font-semibold">
+                <span className="font-mono text-xs uppercase tracking-widest text-[#93c5fd] font-semibold">
                   Registration Form
                 </span>
               </div>
@@ -184,7 +184,7 @@ export default function RegistrationForm({ onProceedToPayment }) {
                   <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
-                        <span className="text-[#7df4ff] font-bold">01.</span> Full Name <span className="text-[#00EEFC]">*</span>
+                        <span className="text-[#38BDF8] font-bold">01.</span> Full Name <span className="text-[#38BDF8]">*</span>
                       </label>
                     </div>
                     <div className="relative">
@@ -197,8 +197,8 @@ export default function RegistrationForm({ onProceedToPayment }) {
                         value={formData.name}
                         onChange={(e) => handleInputChange('name', e.target.value)}
                         placeholder="Aarav Sharma"
-                        className={`w-full bg-[#0F0C19]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 outline-none transition-all shadow-inner ${
-                          errors.name ? 'border-rose-500/80' : 'border-white/15 focus:border-[#00EEFC] focus:ring-2 focus:ring-[#00EEFC]/25'
+                        className={`w-full bg-[#03091e]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 outline-none transition-all shadow-inner ${
+                          errors.name ? 'border-rose-500/80' : 'border-white/15 focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/25'
                         }`}
                       />
                     </div>
@@ -213,7 +213,7 @@ export default function RegistrationForm({ onProceedToPayment }) {
                   <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
-                        <span className="text-[#deb7ff] font-bold">02.</span> SAP ID <span className="text-[#00EEFC]">*</span>
+                        <span className="text-[#60a5fa] font-bold">02.</span> SAP ID <span className="text-[#38BDF8]">*</span>
                       </label>
                       <span className="text-[10px] font-mono text-gray-400">
                         {formData.sapid.length}/9
@@ -230,12 +230,12 @@ export default function RegistrationForm({ onProceedToPayment }) {
                         value={formData.sapid}
                         onChange={(e) => handleInputChange('sapid', e.target.value)}
                         placeholder="590012345"
-                        className={`w-full bg-[#0F0C19]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 font-mono outline-none transition-all shadow-inner ${
-                          errors.sapid || sapidAlreadyRegistered ? 'border-rose-500/80' : 'border-white/15 focus:border-[#00EEFC] focus:ring-2 focus:ring-[#00EEFC]/25'
+                        className={`w-full bg-[#03091e]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 font-mono outline-none transition-all shadow-inner ${
+                          errors.sapid || sapidAlreadyRegistered ? 'border-rose-500/80' : 'border-white/15 focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/25'
                         }`}
                       />
                       {sapidChecking && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#00EEFC] border-t-transparent rounded-full animate-spin" />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#38BDF8] border-t-transparent rounded-full animate-spin" />
                       )}
                     </div>
                     {errors.sapid && (
@@ -254,7 +254,7 @@ export default function RegistrationForm({ onProceedToPayment }) {
                   <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
-                        <span className="text-[#adc7ff] font-bold">03.</span> College Email ID <span className="text-[#00EEFC]">*</span>
+                        <span className="text-[#38BDF8] font-bold">03.</span> College Email ID <span className="text-[#38BDF8]">*</span>
                       </label>
                       <button
                         type="button"
@@ -265,7 +265,7 @@ export default function RegistrationForm({ onProceedToPayment }) {
                             handleInputChange('college_email', 'aarav.12345@stu.upes.ac.in');
                           }
                         }}
-                        className="text-[10px] font-mono text-[#00EEFC] hover:underline"
+                        className="text-[10px] font-mono text-[#38BDF8] hover:underline"
                       >
                         + @stu.upes.ac.in
                       </button>
@@ -280,8 +280,8 @@ export default function RegistrationForm({ onProceedToPayment }) {
                         value={formData.college_email}
                         onChange={(e) => handleInputChange('college_email', e.target.value)}
                         placeholder="aarav.12345@stu.upes.ac.in"
-                        className={`w-full bg-[#0F0C19]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 outline-none transition-all shadow-inner ${
-                          errors.college_email ? 'border-rose-500/80' : 'border-white/15 focus:border-[#00EEFC] focus:ring-2 focus:ring-[#00EEFC]/25'
+                        className={`w-full bg-[#03091e]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 outline-none transition-all shadow-inner ${
+                          errors.college_email ? 'border-rose-500/80' : 'border-white/15 focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/25'
                         }`}
                       />
                     </div>
@@ -296,7 +296,7 @@ export default function RegistrationForm({ onProceedToPayment }) {
                   <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
-                        <span className="text-[#7df4ff] font-bold">04.</span> Phone Number <span className="text-[#00EEFC]">*</span>
+                        <span className="text-[#60a5fa] font-bold">04.</span> Phone Number <span className="text-[#38BDF8]">*</span>
                       </label>
                     </div>
                     <div className="relative">
@@ -310,8 +310,8 @@ export default function RegistrationForm({ onProceedToPayment }) {
                         value={formData.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         placeholder="9876543210"
-                        className={`w-full bg-[#0F0C19]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 font-mono outline-none transition-all shadow-inner ${
-                          errors.phone ? 'border-rose-500/80' : 'border-white/15 focus:border-[#00EEFC] focus:ring-2 focus:ring-[#00EEFC]/25'
+                        className={`w-full bg-[#03091e]/90 border text-white rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-gray-500 font-mono outline-none transition-all shadow-inner ${
+                          errors.phone ? 'border-rose-500/80' : 'border-white/15 focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/25'
                         }`}
                       />
                     </div>
@@ -328,7 +328,7 @@ export default function RegistrationForm({ onProceedToPayment }) {
                 <div className="criteria-box rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <label className="font-mono text-xs uppercase tracking-wider text-gray-300 font-medium flex items-center gap-1.5">
-                      <span className="text-[#deb7ff] font-bold">05.</span> Year of Studying <span className="text-[#00EEFC]">*</span>
+                      <span className="text-[#38BDF8] font-bold">05.</span> Year of Studying <span className="text-[#38BDF8]">*</span>
                     </label>
                   </div>
                   
@@ -342,11 +342,11 @@ export default function RegistrationForm({ onProceedToPayment }) {
                           onClick={() => handleInputChange('current_year', year.id)}
                           className={`flex flex-col items-center justify-center p-3 rounded-xl cursor-pointer text-center transition-all ${
                             isSelected
-                              ? 'bg-[#1D1A27] border-2 border-[#00EEFC] shadow-[0_0_15px_rgba(0,238,252,0.3)]'
-                              : 'bg-[#15111F]/90 border border-white/10 hover:border-white/20'
+                              ? 'bg-[#0a1a3f] border-2 border-[#38BDF8] shadow-[0_0_15px_rgba(56,189,248,0.35)]'
+                              : 'bg-[#050f26]/90 border border-blue-900/30 hover:border-blue-500/30'
                           }`}
                         >
-                          <span className={`font-sora text-xs font-semibold ${isSelected ? 'text-[#00EEFC]' : 'text-white'}`}>
+                          <span className={`font-sora text-xs font-semibold ${isSelected ? 'text-[#38BDF8]' : 'text-white'}`}>
                             {year.label}
                           </span>
                         </button>

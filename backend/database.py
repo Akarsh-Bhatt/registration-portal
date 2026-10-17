@@ -28,7 +28,7 @@ _local_storage: List[Dict[str, Any]] = [
     {
         "_id": "demo-seed-1",
         "id": "demo-seed-1",
-        "registration_id": "HYP-4192",
+        "registration_id": "HYPE4192",
         "name": "Priya Patel",
         "sapid": "590099001",
         "college_email": "priya.99001@stu.upes.ac.in",
@@ -67,7 +67,17 @@ def init_db(uri: Optional[str] = None):
         # Create unique indexes
         collection.create_index("sapid", unique=True)
         collection.create_index("college_email")
-        collection.create_index("registration_id", unique=True)
+        collection.create_index("order_id", unique=True, sparse=True)
+        try:
+            indexes = collection.index_information()
+            if "registration_id_1" in indexes:
+                if not indexes["registration_id_1"].get("sparse", False):
+                    collection.drop_index("registration_id_1")
+                    collection.create_index("registration_id", unique=True, sparse=True)
+            else:
+                collection.create_index("registration_id", unique=True, sparse=True)
+        except Exception as e:
+            logger.warning(f"Could not configure sparse registration_id index: {e}")
 
         is_connected_to_atlas = True
         connection_error_detail = ""
@@ -212,6 +222,8 @@ def get_stats() -> Dict[str, Any]:
     }
 
 def find_by_registration_id(reg_id: str) -> Optional[Dict[str, Any]]:
+    if not reg_id:
+        return None
     if is_connected_to_atlas and collection is not None:
         doc = collection.find_one({"registration_id": reg_id})
         if doc:
@@ -224,31 +236,99 @@ def find_by_registration_id(reg_id: str) -> Optional[Dict[str, Any]]:
                 return item
         return None
 
-def update_payment_record(reg_id: str, payment_info: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def find_by_order_id(order_id: str) -> Optional[Dict[str, Any]]:
+    if not order_id:
+        return None
+    clean_order_id = order_id.strip()
+    if is_connected_to_atlas and collection is not None:
+        doc = collection.find_one({"order_id": clean_order_id})
+        if doc:
+            doc["id"] = str(doc.get("_id"))
+            return doc
+        return None
+    else:
+        for item in _local_storage:
+            if item.get("order_id") == clean_order_id:
+                return item
+        return None
+
+def update_payment_record(identifier: str, payment_info: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
-    Updates the registration record with payment status, transaction ID, and timestamp.
+    Updates the registration record with payment status, transaction ID, assigned registration_id, and timestamp.
+    Accepts identifier which can be order_id, registration_id, or internal id.
     """
     update_fields = {
         "payment_status": "Paid",
+        "status": "Confirmed",
         "order_id": payment_info.get("order_id"),
         "transaction_id": payment_info.get("transaction_id"),
         "amount_paid": payment_info.get("amount", 150.0),
         "payment_method": payment_info.get("payment_method", "UPI"),
-        "paid_at": datetime.now().isoformat()
+        "paid_at": payment_info.get("paid_at", datetime.now().isoformat())
     }
+    if "registration_id" in payment_info and payment_info["registration_id"]:
+        update_fields["registration_id"] = payment_info["registration_id"]
 
     if is_connected_to_atlas and collection is not None:
-        collection.update_one(
-            {"registration_id": reg_id},
-            {"$set": update_fields}
-        )
-        return find_by_registration_id(reg_id)
+        from bson import ObjectId
+        query_conditions = [
+            {"order_id": identifier},
+            {"registration_id": identifier}
+        ]
+        try:
+            if ObjectId.is_valid(identifier):
+                query_conditions.append({"_id": ObjectId(identifier)})
+        except Exception:
+            pass
+
+        query = {"$or": query_conditions}
+        collection.update_one(query, {"$set": update_fields})
+        doc = collection.find_one(query)
+        if doc:
+            doc["id"] = str(doc.get("_id"))
+            return doc
+        return None
     else:
         for item in _local_storage:
-            if item.get("registration_id") == reg_id or item.get("id") == reg_id:
+            if (
+                item.get("order_id") == identifier or 
+                item.get("registration_id") == identifier or 
+                item.get("id") == identifier or
+                item.get("_id") == identifier
+            ):
                 item.update(update_fields)
                 return item
         return None
+
+def delete_registration(identifier: str) -> bool:
+    """
+    Deletes a registration record by registration_id, order_id, or internal ID.
+    """
+    if is_connected_to_atlas and collection is not None:
+        from bson import ObjectId
+        query_conditions = [
+            {"registration_id": identifier},
+            {"order_id": identifier}
+        ]
+        try:
+            if ObjectId.is_valid(identifier):
+                query_conditions.append({"_id": ObjectId(identifier)})
+        except Exception:
+            pass
+
+        res = collection.delete_one({"$or": query_conditions})
+        return res.deleted_count > 0
+    else:
+        global _local_storage
+        initial_len = len(_local_storage)
+        _local_storage = [
+            item for item in _local_storage
+            if item.get("registration_id") != identifier and
+               item.get("order_id") != identifier and
+               item.get("id") != identifier and
+               item.get("_id") != identifier
+        ]
+        return len(_local_storage) < initial_len
 
 def get_all_registration_ids() -> List[str]:
     """
@@ -257,7 +337,7 @@ def get_all_registration_ids() -> List[str]:
     ids: List[str] = []
     if is_connected_to_atlas and collection is not None:
         try:
-            cursor = collection.find({}, {"registration_id": 1})
+            cursor = collection.find({"registration_id": {"$ne": None}}, {"registration_id": 1})
             for doc in cursor:
                 rid = doc.get("registration_id")
                 if rid:

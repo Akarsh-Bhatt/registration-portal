@@ -3,10 +3,10 @@ import React, { useEffect, useRef } from "react";
 
 const DEFAULTS = {
   core: true,
-  coreColor: "#6823C3",
-  midColor: "#007BFF",
-  accentColor: "#9900FF",
-  outerColor: "#00EEFC",
+  coreColor: "#051336",
+  midColor: "#0F2F76",
+  accentColor: "#1D4ED8",
+  outerColor: "#38BDF8",
   detail: 20,
   brightness: 45,
   speed: 25,

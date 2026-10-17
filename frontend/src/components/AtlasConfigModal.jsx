@@ -45,8 +45,8 @@ export default function AtlasConfigModal({ isOpen, onClose, atlasStatus, onStatu
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-xl glass-panel rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl text-left">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#01040d]/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-xl bg-[#040b1e]/95 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-blue-600/30 shadow-[0_0_50px_rgba(29,78,216,0.25)] text-left">
         
         {/* Close Button */}
         <button
@@ -58,28 +58,28 @@ export default function AtlasConfigModal({ isOpen, onClose, atlasStatus, onStatu
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-[#38BDF8]">
             <Database className="w-6 h-6" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-white tracking-tight">
               MongoDB Atlas Configuration
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-sky-200/70 mt-0.5">
               Connect your cloud database to store participants online permanently
             </p>
           </div>
         </div>
 
         {/* Current Status Pill */}
-        <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 mb-6 flex items-center justify-between">
+        <div className="p-3.5 rounded-2xl bg-[#06132d]/90 border border-blue-900/40 mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span className={`w-3 h-3 rounded-full ${atlasStatus?.connected_to_atlas ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
             <div>
               <p className="text-xs font-bold text-white">
                 Status: {atlasStatus?.connected_to_atlas ? 'Connected to MongoDB Atlas' : 'Local Cache Active'}
               </p>
-              <p className="text-[11px] text-slate-400 font-mono">
+              <p className="text-[11px] text-sky-300/70 font-mono">
                 Database: {atlasStatus?.database_name || 'upes_club_portal'}
               </p>
             </div>
@@ -96,7 +96,7 @@ export default function AtlasConfigModal({ isOpen, onClose, atlasStatus, onStatu
         {/* Form to connect URI */}
         <form onSubmit={handleConnect} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-semibold text-sky-200 uppercase tracking-wide mb-1.5">
               MongoDB Atlas Connection String (SRV)
             </label>
             <input
@@ -104,10 +104,10 @@ export default function AtlasConfigModal({ isOpen, onClose, atlasStatus, onStatu
               value={uri}
               onChange={(e) => setUri(e.target.value)}
               placeholder="mongodb+srv://<username>:<password>@cluster0.xyz.mongodb.net/?retryWrites=true&w=majority"
-              className="w-full px-4 py-3 rounded-xl text-xs font-mono glass-input text-white placeholder-slate-500 outline-none"
+              className="w-full px-4 py-3 rounded-xl text-xs font-mono bg-[#020718] border border-blue-900/50 text-white placeholder-slate-500 focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8] outline-none transition-all"
             />
             <p className="text-[11px] text-slate-400 mt-1">
-              You can also specify this permanently in <code className="text-indigo-300">backend/.env</code> as <code className="text-indigo-300">MONGODB_URI</code>.
+              You can also specify this permanently in <code className="text-[#38BDF8] bg-[#06132d] px-1 py-0.5 rounded border border-blue-900/40">backend/.env</code> as <code className="text-[#38BDF8] bg-[#06132d] px-1 py-0.5 rounded border border-blue-900/40">MONGODB_URI</code>.
             </p>
           </div>
 
@@ -129,14 +129,14 @@ export default function AtlasConfigModal({ isOpen, onClose, atlasStatus, onStatu
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-colors"
+              className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-blue-950/60 transition-colors cursor-pointer"
             >
               Close
             </button>
             <button
               type="submit"
               disabled={connecting || !uri.trim()}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 hover:from-blue-600 hover:to-sky-400 text-white shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
             >
               {connecting ? (
                 <>
@@ -154,14 +154,14 @@ export default function AtlasConfigModal({ isOpen, onClose, atlasStatus, onStatu
         </form>
 
         {/* Quick Setup Guide Checklist */}
-        <div className="mt-6 pt-5 border-t border-white/10 text-xs text-slate-400 space-y-2">
+        <div className="mt-6 pt-5 border-t border-blue-900/30 text-xs text-slate-400 space-y-2">
           <p className="font-bold text-white flex items-center gap-1.5">
-            <Key className="w-3.5 h-3.5 text-indigo-400" /> Free MongoDB Atlas Setup (3 Minutes):
+            <Key className="w-3.5 h-3.5 text-[#38BDF8]" /> Free MongoDB Atlas Setup (3 Minutes):
           </p>
-          <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-400">
-            <li>Create a free cluster on <a href="https://cloud.mongodb.com" target="_blank" rel="noreferrer" className="text-indigo-400 underline inline-flex items-center gap-0.5">mongodb.com/cloud/atlas <ExternalLink className="w-2.5 h-2.5" /></a></li>
+          <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-300">
+            <li>Create a free cluster on <a href="https://cloud.mongodb.com" target="_blank" rel="noreferrer" className="text-[#38BDF8] hover:text-white underline inline-flex items-center gap-0.5">mongodb.com/cloud/atlas <ExternalLink className="w-2.5 h-2.5" /></a></li>
             <li>In <strong>Security &gt; Database Access</strong>, add a Database User with password</li>
-            <li>In <strong>Security &gt; Network Access</strong>, add IP Address: <code className="text-white bg-slate-800 px-1 rounded">0.0.0.0/0</code></li>
+            <li>In <strong>Security &gt; Network Access</strong>, add IP Address: <code className="text-[#93c5fd] bg-[#06132d] px-1 rounded border border-blue-900/40">0.0.0.0/0</code></li>
             <li>Click <strong>Connect &gt; Drivers (Python)</strong> and paste the connection string above</li>
           </ol>
         </div>

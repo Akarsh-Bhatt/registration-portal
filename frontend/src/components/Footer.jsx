@@ -3,7 +3,7 @@ import hypervisionLogo from '../assets/logo.png';
 
 export default function Footer({ onOpenAtlasModal }) {
   return (
-    <footer className="w-full border-t border-white/10 bg-[#0F0C19]/80 backdrop-blur-xl py-8 relative z-20">
+    <footer className="w-full border-t border-blue-950/70 bg-[#020614]/95 backdrop-blur-xl py-8 static z-20 mt-auto">
       <div className="max-w-[1240px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
         
         {/* Brand & University */}
@@ -11,14 +11,14 @@ export default function Footer({ onOpenAtlasModal }) {
           <div className="flex items-center justify-center md:justify-start gap-2">
             <img
               alt="Hypervision Logo"
-              className="h-9 w-auto object-contain drop-shadow-[0_0_10px_rgba(0,238,252,0.4)]"
+              className="h-9 w-auto object-contain drop-shadow-[0_0_10px_rgba(56,189,248,0.5)]"
               src={hypervisionLogo}
             />
             <span className="font-sora font-bold text-sm text-white uppercase tracking-tight">
               hypervision
             </span>
           </div>
-          <p className="font-outfit text-xs text-gray-400">
+          <p className="font-outfit text-xs text-sky-200/60">
             University of Petroleum and Energy Studies
           </p>
         </div>
@@ -27,7 +27,7 @@ export default function Footer({ onOpenAtlasModal }) {
         <div className="flex items-center gap-4 font-mono text-xs text-gray-400">
           <a
             aria-label="LinkedIn"
-            className="w-10 h-10 rounded-xl bg-[#15111F]/80 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#00EEFC] hover:border-cyan-400/50 hover:bg-white/5 transition-all duration-300 shadow-inner group"
+            className="w-10 h-10 rounded-xl bg-[#06112a]/80 border border-blue-900/30 flex items-center justify-center text-gray-400 hover:text-[#38BDF8] hover:border-blue-400/50 hover:bg-white/5 transition-all duration-300 shadow-inner group"
             href="https://www.linkedin.com/in/upeshypervision/"
             rel="noopener noreferrer"
             target="_blank"
@@ -39,7 +39,7 @@ export default function Footer({ onOpenAtlasModal }) {
 
           <a
             aria-label="Instagram"
-            className="w-10 h-10 rounded-xl bg-[#15111F]/80 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#deb7ff] hover:border-purple-500/30 hover:bg-white/5 transition-all duration-300 shadow-inner group"
+            className="w-10 h-10 rounded-xl bg-[#06112a]/80 border border-blue-900/30 flex items-center justify-center text-gray-400 hover:text-[#60a5fa] hover:border-blue-400/50 hover:bg-white/5 transition-all duration-300 shadow-inner group"
             href="https://www.instagram.com/upeshypervision/"
             rel="noopener noreferrer"
             target="_blank"
@@ -51,7 +51,7 @@ export default function Footer({ onOpenAtlasModal }) {
 
           <a
             aria-label="Email"
-            className="w-10 h-10 rounded-xl bg-[#15111F]/80 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#7df4ff] hover:border-cyan-400/50 hover:bg-white/5 transition-all duration-300 shadow-inner group"
+            className="w-10 h-10 rounded-xl bg-[#06112a]/80 border border-blue-900/30 flex items-center justify-center text-gray-400 hover:text-[#38BDF8] hover:border-blue-400/50 hover:bg-white/5 transition-all duration-300 shadow-inner group"
             href="mailto:upes.hypervision@stu.upes.ac.in"
           >
             <span className="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">
@@ -61,7 +61,7 @@ export default function Footer({ onOpenAtlasModal }) {
         </div>
 
         {/* Copyright */}
-        <div className="font-mono text-xs text-gray-500">
+        <div className="font-mono text-xs text-sky-200/40">
           © 2026 Hypervision. All rights reserved.
         </div>
 
