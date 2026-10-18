@@ -8,7 +8,13 @@ export default function Navbar({ currentStep }) {
         
         {/* Brand & Rotating Tagline */}
         <div className="flex items-center gap-4">
-          <a className="flex items-center gap-3.5 group cursor-pointer" href="#">
+          <a
+            className="flex items-center gap-3.5 group cursor-pointer"
+            href="https://www.upeshypervision.in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="HyperVision Official Website"
+          >
             <div className="h-14 w-14 flex items-center justify-center">
               <img
                 alt="Hypervision Logo"
@@ -33,7 +39,7 @@ export default function Navbar({ currentStep }) {
           </a>
         </div>
 
-        {/* Right Status Badges */}
+        {/* Right Status Badges & Navigation */}
         <div className="flex items-center gap-3">
           
           {/* Step indicator badge matching pg2/pg3 */}
@@ -50,6 +56,17 @@ export default function Navbar({ currentStep }) {
               <span className="font-semibold tracking-wider uppercase">Registration Verified</span>
             </div>
           )}
+
+          {/* HyperVision Home Link */}
+          <a
+            href="https://www.upeshypervision.in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="HyperVision Official Website"
+            className="group relative inline-flex items-center justify-center px-5 py-2 md:px-6 md:py-2 rounded-full bg-[#05112a]/90 hover:bg-[#091a42] border border-[#38BDF8]/40 hover:border-[#38BDF8] text-base md:text-lg font-sora font-bold text-[#38BDF8] hover:text-white shadow-[0_0_15px_rgba(56,189,248,0.2)] hover:shadow-[0_0_25px_rgba(56,189,248,0.45)] hover:scale-105 active:scale-95 transition-all duration-300 uppercase tracking-wider cursor-pointer"
+          >
+            Home
+          </a>
 
         </div>
 
